@@ -4,350 +4,212 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>SmartFix Computer Service</title>
-
   <style>
-    :root{
-      --bg1:#071a2b;
-      --bg2:#0b2a3f;
-      --card:#ffffff;
-      --text:#0d1721;
-      --muted:#6b7280;
-      --brand:#1e88ff;
-      --brand2:#00c2ff;
-      --danger:#ff3b3b;
-      --ok:#16a34a;
-      --shadow: 0 20px 60px rgba(0,0,0,.25);
-      --radius:18px;
-    }
-    *{box-sizing:border-box;font-family:system-ui,Segoe UI,Arial;}
     body{
-      margin:0;
-      min-height:100vh;
-      background: radial-gradient(1200px 600px at 20% 10%, #143a66 0%, transparent 60%),
-                  radial-gradient(900px 500px at 80% 20%, #0a6aa6 0%, transparent 55%),
-                  linear-gradient(180deg, var(--bg1), #030b14 70%);
+      margin:0; font-family: Arial, sans-serif;
+      background: linear-gradient(120deg,#061a2b,#0b3b57,#061a2b);
+      color:#111;
       display:flex;
-      align-items:center;
       justify-content:center;
-      padding:22px;
-      color:#fff;
+      padding:30px;
     }
-    .wrap{width:100%; max-width:980px;}
-    .topbar{
-      background: linear-gradient(90deg, rgba(30,136,255,.18), rgba(0,194,255,.12));
-      border:1px solid rgba(255,255,255,.12);
-      border-radius: 22px;
-      padding:18px 18px;
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:12px;
-      box-shadow: var(--shadow);
-      backdrop-filter: blur(8px);
-    }
-    .brand{
-      display:flex; align-items:center; gap:12px;
-    }
-    .logo{
-      width:46px;height:46px;border-radius:14px;
-      background: linear-gradient(135deg, var(--brand), var(--brand2));
-      display:flex;align-items:center;justify-content:center;
-      box-shadow: 0 12px 30px rgba(30,136,255,.35);
-      font-size:22px;
-    }
-    .brand h1{margin:0;font-size:22px;line-height:1.1}
-    .brand p{margin:2px 0 0;color:rgba(255,255,255,.75);font-size:13px}
-    .chips{display:flex; gap:10px; flex-wrap:wrap; justify-content:flex-end}
-    .chip{
-      padding:8px 12px;
-      border-radius:999px;
-      background: rgba(255,255,255,.08);
-      border:1px solid rgba(255,255,255,.12);
-      font-size:12px;
-      color:rgba(255,255,255,.85);
-    }
-
     .card{
-      margin-top:18px;
-      background: rgba(255,255,255,.95);
-      color:var(--text);
-      border-radius: 22px;
-      box-shadow: var(--shadow);
+      width:900px;
+      background:#fff;
+      border-radius:20px;
+      box-shadow:0 10px 30px rgba(0,0,0,.3);
       overflow:hidden;
     }
+    header{
+      padding:25px;
+      background: linear-gradient(90deg,#0d47a1,#00acc1);
+      color:white;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+    }
+    header h1{margin:0;font-size:26px;}
+    header p{margin:5px 0 0; opacity:.9}
     .tabs{
       display:flex;
       gap:10px;
-      padding:16px;
+      padding:15px;
+      background:#f3f7fb;
       justify-content:center;
-      background: linear-gradient(180deg, rgba(0,0,0,.03), transparent);
     }
-    .tabbtn{
-      width:180px;
+    .tabs button{
+      padding:10px 20px;
       border:none;
+      border-radius:12px;
       cursor:pointer;
-      padding:12px 14px;
-      border-radius: 999px;
-      background:#eef2f7;
-      color:#0b2239;
-      font-weight:700;
-      transition:.2s;
+      font-weight:bold;
+      background:#e0e0e0;
     }
-    .tabbtn.active{
-      background: linear-gradient(90deg, var(--brand), var(--brand2));
+    .tabs button.active{
+      background:#0d47a1;
       color:white;
-      box-shadow: 0 10px 24px rgba(30,136,255,.25);
     }
     .content{
-      padding:18px 18px 22px;
-      max-width:900px;
-      margin:0 auto;
+      padding:25px;
     }
-    .title{
-      display:flex; align-items:center; gap:10px;
-      margin:10px 0 12px;
+    .box{
+      background:#f8fbff;
+      padding:20px;
+      border-radius:15px;
+      margin-bottom:20px;
+      border:1px solid #e1e7f0;
     }
-    .title .icon{
-      width:36px;height:36px;border-radius:12px;
-      background: rgba(30,136,255,.12);
-      display:flex;align-items:center;justify-content:center;
-      color: var(--brand);
-      font-weight:900;
-    }
-    .title h2{margin:0;font-size:22px}
-    .grid{
-      display:grid;
-      grid-template-columns: 1fr 1fr;
-      gap:12px;
-    }
-    @media(max-width:780px){
-      .grid{grid-template-columns:1fr;}
-      .tabbtn{width:32%;}
-      .chips{justify-content:flex-start}
-    }
-    .field{
-      display:flex;
-      flex-direction:column;
-      gap:6px;
-    }
-    label{font-size:12px;color:var(--muted)}
+    h2{margin-top:0;}
     input, select, textarea{
       width:100%;
-      padding:12px 12px;
-      border-radius: 14px;
-      border:1px solid #d7dde6;
-      outline:none;
-      font-size:14px;
-      background:#fff;
+      padding:12px;
+      border-radius:10px;
+      border:1px solid #ccc;
+      margin-top:10px;
+      font-size:15px;
     }
-    textarea{min-height:90px; resize:vertical;}
-    .btn{
-      width:100%;
-      border:none;
-      cursor:pointer;
-      padding:13px 14px;
-      border-radius: 14px;
-      font-weight:800;
-      font-size:14px;
-      color:white;
-      background: linear-gradient(90deg, var(--brand), var(--brand2));
-      box-shadow: 0 12px 30px rgba(30,136,255,.22);
-      transition:.15s;
-    }
-    .btn:active{transform:scale(.99)}
-    .btn.secondary{
-      background:#0b2239;
-      box-shadow:none;
-    }
+    textarea{height:90px; resize:none;}
     .row{
-      display:flex; gap:10px; align-items:center; flex-wrap:wrap;
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:15px;
+    }
+    .btn{
+      margin-top:15px;
+      width:100%;
+      padding:14px;
+      border:none;
+      border-radius:12px;
+      font-size:16px;
+      font-weight:bold;
+      cursor:pointer;
+      background:linear-gradient(90deg,#0d47a1,#00acc1);
+      color:white;
     }
     .msg{
-      margin-top:12px;
-      padding:12px 14px;
-      border-radius: 14px;
-      background:#f1f5f9;
-      color:#0b2239;
-      border:1px solid #e2e8f0;
-      font-size:13px;
+      margin-top:10px;
+      font-weight:bold;
     }
-    .msg.ok{background:#ecfdf5;border-color:#bbf7d0;color:#065f46}
-    .msg.err{background:#fef2f2;border-color:#fecaca;color:#7f1d1d}
-    .footer{
-      padding:14px 18px;
+    .topbar{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-bottom:15px;
+    }
+    .logoutBtn{
+      background:#e53935;
+      color:white;
+      padding:10px 15px;
+      border:none;
+      border-radius:10px;
+      cursor:pointer;
+      font-weight:bold;
+    }
+    footer{
       text-align:center;
-      color:rgba(255,255,255,.75);
-      font-size:12px;
+      padding:15px;
+      background:#f3f7fb;
+      color:#333;
+      font-size:14px;
     }
-    .mini{
-      font-size:12px;color:var(--muted);
-      margin-top:8px;
-    }
-    .hidden{display:none;}
+    .hide{display:none;}
   </style>
 </head>
 
 <body>
-  <div class="wrap">
-    <div class="topbar">
-      <div class="brand">
-        <div class="logo">💻</div>
-        <div>
-          <h1>SmartFix Computer Service</h1>
-          <p>Fast • Trusted • Affordable Repair & Support</p>
-        </div>
+  <div class="card">
+    <header>
+      <div>
+        <h1>💻 SmartFix Computer Service</h1>
+        <p>Fast • Trusted • Affordable Repair & Support</p>
       </div>
-      <div class="chips">
-        <div class="chip">🛠 PC & Laptop Repair</div>
-        <div class="chip">⚡ Same Day Service</div>
-        <div class="chip">🏠 Home Support</div>
+      <div>
+        <button class="logoutBtn hide" id="logoutBtn">Logout</button>
       </div>
+    </header>
+
+    <div class="tabs">
+      <button id="tabRegister" class="active" onclick="showTab('register')">Register</button>
+      <button id="tabLogin" onclick="showTab('login')">Login</button>
+      <button id="tabBooking" onclick="showTab('booking')">Booking</button>
     </div>
 
-    <div class="card">
-      <div class="tabs">
-        <button class="tabbtn active" id="tabRegister" onclick="showTab('register')">Register</button>
-        <button class="tabbtn" id="tabLogin" onclick="showTab('login')">Login</button>
-        <button class="tabbtn" id="tabBooking" onclick="showTab('booking')">Booking</button>
+    <div class="content">
+
+      <!-- REGISTER -->
+      <div id="register" class="box">
+        <h2>📝 Create Account</h2>
+        <div class="row">
+          <input id="regName" type="text" placeholder="Full Name">
+          <input id="regPhone" type="text" placeholder="Phone Number">
+        </div>
+        <input id="regEmail" type="email" placeholder="Email Address">
+        <input id="regPass" type="password" placeholder="Password">
+        <button class="btn" onclick="registerUser()">Register</button>
+        <div class="msg" id="regMsg"></div>
       </div>
 
-      <div class="content">
-
-        <!-- REGISTER -->
-        <div id="register" class="tab">
-          <div class="title">
-            <div class="icon">👤</div>
-            <h2>Create Account</h2>
-          </div>
-
-          <div class="grid">
-            <div class="field">
-              <label>Full Name</label>
-              <input id="r_name" placeholder="Your full name" />
-            </div>
-            <div class="field">
-              <label>Phone Number</label>
-              <input id="r_phone" placeholder="Your phone number" />
-            </div>
-            <div class="field" style="grid-column:1/-1">
-              <label>Email Address</label>
-              <input id="r_email" type="email" placeholder="example@gmail.com" />
-            </div>
-            <div class="field" style="grid-column:1/-1">
-              <label>Password</label>
-              <input id="r_pass" type="password" placeholder="Create a strong password" />
-            </div>
-          </div>
-
-          <div style="margin-top:12px;">
-            <button class="btn" onclick="registerUser()">Register</button>
-            <div class="mini">After registration, go to Login tab.</div>
-            <div id="r_msg" class="msg hidden"></div>
-          </div>
-        </div>
-
-        <!-- LOGIN -->
-        <div id="login" class="tab hidden">
-          <div class="title">
-            <div class="icon">🔐</div>
-            <h2>Login</h2>
-          </div>
-
-          <div class="grid">
-            <div class="field" style="grid-column:1/-1">
-              <label>Email Address</label>
-              <input id="l_email" type="email" placeholder="example@gmail.com" />
-            </div>
-            <div class="field" style="grid-column:1/-1">
-              <label>Password</label>
-              <input id="l_pass" type="password" placeholder="Your password" />
-            </div>
-          </div>
-
-          <div style="margin-top:12px;">
-            <button class="btn" onclick="loginUser()">Login</button>
-            <button class="btn secondary" style="margin-top:10px;" onclick="logoutUser()">Logout</button>
-            <div id="l_msg" class="msg hidden"></div>
-          </div>
-        </div>
-
-        <!-- BOOKING -->
-        <div id="booking" class="tab hidden">
-          <div class="title">
-            <div class="icon">📅</div>
-            <h2>Book a Service</h2>
-          </div>
-
-          <div class="grid">
-            <div class="field">
-              <label>Service Type</label>
-              <select id="b_service">
-                <option value="PC Repair">PC Repair</option>
-                <option value="Laptop Repair">Laptop Repair</option>
-                <option value="Windows Install">Windows Install</option>
-                <option value="Virus Removal">Virus Removal</option>
-                <option value="Data Recovery">Data Recovery</option>
-                <option value="Networking / WiFi">Networking / WiFi</option>
-              </select>
-            </div>
-            <div class="field">
-              <label>Preferred Date</label>
-              <input id="b_date" type="date" />
-            </div>
-
-            <div class="field">
-              <label>Preferred Time</label>
-              <input id="b_time" type="time" />
-            </div>
-
-            <div class="field">
-              <label>Customer Phone</label>
-              <input id="b_phone" placeholder="Your phone number" />
-            </div>
-
-            <div class="field" style="grid-column:1/-1">
-              <label>Address</label>
-              <input id="b_address" placeholder="Full address (Area, City, Landmark)" />
-            </div>
-
-            <div class="field" style="grid-column:1/-1">
-              <label>Problem Details</label>
-              <textarea id="b_details" placeholder="Write your problem details..."></textarea>
-            </div>
-          </div>
-
-          <div style="margin-top:12px;">
-            <button class="btn" onclick="submitBooking()">Submit Booking</button>
-            <div class="mini">⚠️ You must be logged in to book.</div>
-            <div id="b_msg" class="msg hidden"></div>
-          </div>
-        </div>
-
+      <!-- LOGIN -->
+      <div id="login" class="box hide">
+        <h2>🔐 Login</h2>
+        <input id="logEmail" type="email" placeholder="Email Address">
+        <input id="logPass" type="password" placeholder="Password">
+        <button class="btn" onclick="loginUser()">Login</button>
+        <div class="msg" id="logMsg"></div>
       </div>
+
+      <!-- BOOKING -->
+      <div id="booking" class="box hide">
+        <div class="topbar">
+          <h2>📅 Book a Service</h2>
+          <div><b>Logged in as:</b> <span id="userEmail">---</span></div>
+        </div>
+
+        <input id="bkName" type="text" placeholder="Customer Name">
+        <input id="bkPhone" type="text" placeholder="Customer Phone">
+        <input id="bkAddress" type="text" placeholder="Customer Address">
+
+        <select id="bkService">
+          <option value="">Select Service Type</option>
+          <option>PC Repair</option>
+          <option>Laptop Repair</option>
+          <option>Windows Install</option>
+          <option>Printer Setup</option>
+        </select>
+
+        <textarea id="bkDetails" placeholder="Problem details..."></textarea>
+
+        <div class="row">
+          <input id="bkDate" type="date">
+          <input id="bkTime" type="time">
+        </div>
+
+        <button class="btn" onclick="submitBooking()">Submit Booking</button>
+        <div class="msg" id="bkMsg"></div>
+
+        <p style="margin-top:15px;">
+          🔥 Admin panel: <a href="admin.html" target="_blank">Open Admin Dashboard</a>
+        </p>
+      </div>
+
     </div>
 
-    <div class="footer">© 2026 SmartFix Computer Service • Powered by GitHub Pages + Firebase</div>
+    <footer>
+      © 2026 SmartFix Computer Service • Powered by GitHub Pages + Firebase
+    </footer>
   </div>
 
-  <!-- Firebase (Module) -->
+  <!-- Firebase (Module Script) -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-app.js";
-    import {
-      getAuth,
-      createUserWithEmailAndPassword,
-      signInWithEmailAndPassword,
-      signOut,
-      onAuthStateChanged
-    } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-auth.js";
+    import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } 
+      from "https://www.gstatic.com/firebasejs/12.8.0/firebase-auth.js";
+    import { getFirestore, collection, addDoc, serverTimestamp } 
+      from "https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore.js";
 
-    import {
-      getFirestore,
-      collection,
-      addDoc,
-      serverTimestamp
-    } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore.js";
-
-    // Your Firebase config
+    // 🔥 Your Firebase Config (yours)
     const firebaseConfig = {
       apiKey: "AIzaSyDL2OFxYzmXKUp5edh6QtD2f5gkb6oZAv4",
       authDomain: "smartfix-computer-service.firebaseapp.com",
@@ -362,131 +224,129 @@
     const db = getFirestore(app);
 
     // UI Helpers
-    window.showTab = (name) => {
-      document.querySelectorAll(".tab").forEach(t => t.classList.add("hidden"));
-      document.getElementById(name).classList.remove("hidden");
+    window.showTab = function(tab){
+      document.getElementById("register").classList.add("hide");
+      document.getElementById("login").classList.add("hide");
+      document.getElementById("booking").classList.add("hide");
 
-      document.querySelectorAll(".tabbtn").forEach(b => b.classList.remove("active"));
-      if(name === "register") document.getElementById("tabRegister").classList.add("active");
-      if(name === "login") document.getElementById("tabLogin").classList.add("active");
-      if(name === "booking") document.getElementById("tabBooking").classList.add("active");
-    };
+      document.getElementById(tab).classList.remove("hide");
 
-    function setMsg(id, text, type="ok"){
-      const el = document.getElementById(id);
-      el.classList.remove("hidden","ok","err");
-      el.classList.add(type === "ok" ? "ok" : "err");
-      el.textContent = text;
+      document.getElementById("tabRegister").classList.remove("active");
+      document.getElementById("tabLogin").classList.remove("active");
+      document.getElementById("tabBooking").classList.remove("active");
+
+      if(tab==="register") document.getElementById("tabRegister").classList.add("active");
+      if(tab==="login") document.getElementById("tabLogin").classList.add("active");
+      if(tab==="booking") document.getElementById("tabBooking").classList.add("active");
     }
 
     // Register
-    window.registerUser = async () => {
-      const name = document.getElementById("r_name").value.trim();
-      const phone = document.getElementById("r_phone").value.trim();
-      const email = document.getElementById("r_email").value.trim();
-      const pass = document.getElementById("r_pass").value.trim();
+    window.registerUser = async function(){
+      const name = document.getElementById("regName").value.trim();
+      const phone = document.getElementById("regPhone").value.trim();
+      const email = document.getElementById("regEmail").value.trim();
+      const pass = document.getElementById("regPass").value.trim();
+      const msg = document.getElementById("regMsg");
+
+      msg.innerHTML = "";
 
       if(!name || !phone || !email || !pass){
-        setMsg("r_msg","Please fill all fields.","err");
+        msg.style.color="red";
+        msg.innerHTML="❌ Please fill all fields!";
         return;
       }
 
       try{
         await createUserWithEmailAndPassword(auth, email, pass);
-
-        // Save user profile to Firestore
-        await addDoc(collection(db, "users"), {
-          name,
-          phone,
-          email,
-          createdAt: serverTimestamp()
-        });
-
-        setMsg("r_msg","Registration successful! Now go to Login tab.","ok");
+        msg.style.color="green";
+        msg.innerHTML="✅ Registration successful! Now Login.";
+        showTab("login");
       }catch(e){
-        setMsg("r_msg", e.message, "err");
+        msg.style.color="red";
+        msg.innerHTML="❌ " + e.message;
       }
-    };
+    }
 
     // Login
-    window.loginUser = async () => {
-      const email = document.getElementById("l_email").value.trim();
-      const pass = document.getElementById("l_pass").value.trim();
+    window.loginUser = async function(){
+      const email = document.getElementById("logEmail").value.trim();
+      const pass = document.getElementById("logPass").value.trim();
+      const msg = document.getElementById("logMsg");
 
-      if(!email || !pass){
-        setMsg("l_msg","Enter email & password.","err");
-        return;
-      }
+      msg.innerHTML="";
 
       try{
         await signInWithEmailAndPassword(auth, email, pass);
-        setMsg("l_msg","Login successful! Now go to Booking tab.","ok");
+        msg.style.color="green";
+        msg.innerHTML="✅ Login successful!";
+        showTab("booking");
       }catch(e){
-        setMsg("l_msg", e.message, "err");
+        msg.style.color="red";
+        msg.innerHTML="❌ " + e.message;
       }
-    };
+    }
 
-    // Logout
-    window.logoutUser = async () => {
-      try{
-        await signOut(auth);
-        setMsg("l_msg","Logged out successfully.","ok");
-      }catch(e){
-        setMsg("l_msg", e.message, "err");
-      }
-    };
-
-    // Booking
-    window.submitBooking = async () => {
+    // Booking Submit
+    window.submitBooking = async function(){
       const user = auth.currentUser;
+      const msg = document.getElementById("bkMsg");
+
       if(!user){
-        setMsg("b_msg","You must login first.","err");
+        msg.style.color="red";
+        msg.innerHTML="❌ Please login first!";
         showTab("login");
         return;
       }
 
-      const service = document.getElementById("b_service").value;
-      const date = document.getElementById("b_date").value;
-      const time = document.getElementById("b_time").value;
-      const phone = document.getElementById("b_phone").value.trim();
-      const address = document.getElementById("b_address").value.trim();
-      const details = document.getElementById("b_details").value.trim();
+      const name = document.getElementById("bkName").value.trim();
+      const phone = document.getElementById("bkPhone").value.trim();
+      const address = document.getElementById("bkAddress").value.trim();
+      const service = document.getElementById("bkService").value.trim();
+      const details = document.getElementById("bkDetails").value.trim();
+      const date = document.getElementById("bkDate").value;
+      const time = document.getElementById("bkTime").value;
 
-      if(!date || !time || !phone || !address || !details){
-        setMsg("b_msg","Please fill all booking fields.","err");
+      if(!name || !phone || !address || !service || !details || !date || !time){
+        msg.style.color="red";
+        msg.innerHTML="❌ Please fill all booking fields!";
         return;
       }
 
       try{
         await addDoc(collection(db, "bookings"), {
           userEmail: user.email,
-          service,
-          date,
-          time,
-          phone,
-          address,
-          details,
+          name, phone, address, service, details, date, time,
           status: "Pending",
           createdAt: serverTimestamp()
         });
 
-        setMsg("b_msg","Booking submitted successfully! We will contact you soon.","ok");
+        msg.style.color="green";
+        msg.innerHTML="✅ Booking submitted successfully!";
 
         // Clear fields
-        document.getElementById("b_date").value = "";
-        document.getElementById("b_time").value = "";
-        document.getElementById("b_phone").value = "";
-        document.getElementById("b_address").value = "";
-        document.getElementById("b_details").value = "";
+        document.getElementById("bkDetails").value="";
       }catch(e){
-        setMsg("b_msg", e.message, "err");
+        msg.style.color="red";
+        msg.innerHTML="❌ " + e.message;
       }
-    };
+    }
 
-    // Auth watcher
-    onAuthStateChanged(auth, (user) => {
-      // optional: you can auto-switch tabs
-      // console.log("Auth state:", user?.email);
+    // Auth State
+    onAuthStateChanged(auth, (user)=>{
+      const logoutBtn = document.getElementById("logoutBtn");
+      if(user){
+        document.getElementById("userEmail").innerText = user.email;
+        logoutBtn.classList.remove("hide");
+      }else{
+        document.getElementById("userEmail").innerText = "---";
+        logoutBtn.classList.add("hide");
+      }
+    });
+
+    // Logout
+    document.getElementById("logoutBtn").addEventListener("click", async ()=>{
+      await signOut(auth);
+      showTab("login");
     });
   </script>
 </body>
