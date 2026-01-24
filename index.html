@@ -7,378 +7,487 @@
 
   <style>
     :root{
-      --primary:#2563eb;
-      --primary2:#06b6d4;
-      --dark:#0f172a;
-      --text:#1f2937;
-      --muted:#64748b;
-      --bg:#0b1220;
+      --bg1:#071a2b;
+      --bg2:#0b2a3f;
       --card:#ffffff;
-      --line:#e5e7eb;
-      --success:#16a34a;
+      --text:#0d1721;
+      --muted:#6b7280;
+      --brand:#1e88ff;
+      --brand2:#00c2ff;
+      --danger:#ff3b3b;
+      --ok:#16a34a;
+      --shadow: 0 20px 60px rgba(0,0,0,.25);
+      --radius:18px;
     }
-
-    *{box-sizing:border-box;}
+    *{box-sizing:border-box;font-family:system-ui,Segoe UI,Arial;}
     body{
       margin:0;
-      font-family: Arial, sans-serif;
-      background: radial-gradient(1200px 600px at 10% 10%, rgba(37,99,235,.35), transparent 60%),
-                  radial-gradient(1000px 500px at 90% 20%, rgba(6,182,212,.30), transparent 55%),
-                  linear-gradient(180deg, #0b1220, #0a0f1c);
       min-height:100vh;
-      padding:22px;
-      color:#fff;
-    }
-
-    .wrap{
-      max-width:980px;
-      margin:auto;
-    }
-
-    /* Header */
-    .hero{
-      background: linear-gradient(135deg, rgba(37,99,235,.18), rgba(6,182,212,.12));
-      border:1px solid rgba(255,255,255,.10);
-      border-radius:22px;
-      padding:22px;
-      box-shadow: 0 18px 60px rgba(0,0,0,.35);
-      backdrop-filter: blur(10px);
-    }
-
-    .top{
-      display:flex;
-      gap:18px;
-      align-items:center;
-      justify-content:space-between;
-      flex-wrap:wrap;
-    }
-
-    .brand{
-      display:flex;
-      gap:14px;
-      align-items:center;
-    }
-
-    .logo{
-      width:52px;
-      height:52px;
-      border-radius:16px;
-      background: linear-gradient(135deg, var(--primary), var(--primary2));
+      background: radial-gradient(1200px 600px at 20% 10%, #143a66 0%, transparent 60%),
+                  radial-gradient(900px 500px at 80% 20%, #0a6aa6 0%, transparent 55%),
+                  linear-gradient(180deg, var(--bg1), #030b14 70%);
       display:flex;
       align-items:center;
       justify-content:center;
-      box-shadow: 0 10px 25px rgba(37,99,235,.35);
-      flex-shrink:0;
+      padding:22px;
+      color:#fff;
     }
-
-    .logo svg{ width:28px; height:28px; fill:#fff; }
-
-    .brand h1{
-      margin:0;
-      font-size:26px;
-      letter-spacing:.2px;
-    }
-
-    .brand p{
-      margin:3px 0 0;
-      color:rgba(255,255,255,.75);
-      font-size:14px;
-    }
-
-    .badges{
+    .wrap{width:100%; max-width:980px;}
+    .topbar{
+      background: linear-gradient(90deg, rgba(30,136,255,.18), rgba(0,194,255,.12));
+      border:1px solid rgba(255,255,255,.12);
+      border-radius: 22px;
+      padding:18px 18px;
       display:flex;
-      gap:10px;
-      flex-wrap:wrap;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(8px);
     }
-    .badge{
+    .brand{
+      display:flex; align-items:center; gap:12px;
+    }
+    .logo{
+      width:46px;height:46px;border-radius:14px;
+      background: linear-gradient(135deg, var(--brand), var(--brand2));
+      display:flex;align-items:center;justify-content:center;
+      box-shadow: 0 12px 30px rgba(30,136,255,.35);
+      font-size:22px;
+    }
+    .brand h1{margin:0;font-size:22px;line-height:1.1}
+    .brand p{margin:2px 0 0;color:rgba(255,255,255,.75);font-size:13px}
+    .chips{display:flex; gap:10px; flex-wrap:wrap; justify-content:flex-end}
+    .chip{
       padding:8px 12px;
       border-radius:999px;
-      font-size:13px;
       background: rgba(255,255,255,.08);
-      border:1px solid rgba(255,255,255,.10);
+      border:1px solid rgba(255,255,255,.12);
+      font-size:12px;
       color:rgba(255,255,255,.85);
     }
 
-    /* Main Card */
     .card{
       margin-top:18px;
-      background: var(--card);
+      background: rgba(255,255,255,.95);
       color:var(--text);
-      border-radius:22px;
-      padding:18px;
-      box-shadow: 0 18px 60px rgba(0,0,0,.35);
-      border:1px solid rgba(255,255,255,.06);
+      border-radius: 22px;
+      box-shadow: var(--shadow);
+      overflow:hidden;
     }
-
     .tabs{
       display:flex;
       gap:10px;
+      padding:16px;
       justify-content:center;
-      flex-wrap:wrap;
-      margin:10px 0 18px;
+      background: linear-gradient(180deg, rgba(0,0,0,.03), transparent);
     }
     .tabbtn{
+      width:180px;
       border:none;
       cursor:pointer;
-      padding:12px 16px;
-      border-radius:14px;
-      background:#f1f5f9;
-      color:#0f172a;
+      padding:12px 14px;
+      border-radius: 999px;
+      background:#eef2f7;
+      color:#0b2239;
       font-weight:700;
-      min-width:140px;
       transition:.2s;
     }
-    .tabbtn:hover{ transform: translateY(-1px); }
     .tabbtn.active{
-      background: linear-gradient(135deg, var(--primary), var(--primary2));
-      color:#fff;
-      box-shadow: 0 10px 25px rgba(37,99,235,.25);
+      background: linear-gradient(90deg, var(--brand), var(--brand2));
+      color:white;
+      box-shadow: 0 10px 24px rgba(30,136,255,.25);
     }
-
-    .section{
-      display:none;
-      padding:10px 6px 4px;
+    .content{
+      padding:18px 18px 22px;
+      max-width:900px;
+      margin:0 auto;
     }
-    .section.active{ display:block; }
-
-    .titleRow{
-      display:flex;
-      align-items:center;
-      gap:10px;
-      margin:6px 0 14px;
+    .title{
+      display:flex; align-items:center; gap:10px;
+      margin:10px 0 12px;
     }
-    .titleIcon{
-      width:38px;
-      height:38px;
-      border-radius:12px;
-      background: rgba(37,99,235,.12);
-      display:flex;
-      align-items:center;
-      justify-content:center;
+    .title .icon{
+      width:36px;height:36px;border-radius:12px;
+      background: rgba(30,136,255,.12);
+      display:flex;align-items:center;justify-content:center;
+      color: var(--brand);
+      font-weight:900;
     }
-    .titleIcon svg{ width:20px; height:20px; fill: var(--primary); }
-
-    h2{
-      margin:0;
-      font-size:20px;
-      color:var(--dark);
-    }
-
+    .title h2{margin:0;font-size:22px}
     .grid{
       display:grid;
       grid-template-columns: 1fr 1fr;
       gap:12px;
     }
-    @media(max-width:720px){
-      .grid{ grid-template-columns:1fr; }
-      .tabbtn{ min-width:110px; width:100%; }
+    @media(max-width:780px){
+      .grid{grid-template-columns:1fr;}
+      .tabbtn{width:32%;}
+      .chips{justify-content:flex-start}
     }
-
+    .field{
+      display:flex;
+      flex-direction:column;
+      gap:6px;
+    }
+    label{font-size:12px;color:var(--muted)}
     input, select, textarea{
       width:100%;
       padding:12px 12px;
-      border-radius:14px;
-      border:1px solid var(--line);
-      font-size:15px;
+      border-radius: 14px;
+      border:1px solid #d7dde6;
       outline:none;
-      transition:.15s;
+      font-size:14px;
       background:#fff;
     }
-    input:focus, select:focus, textarea:focus{
-      border-color: rgba(37,99,235,.65);
-      box-shadow: 0 0 0 4px rgba(37,99,235,.12);
-    }
-    textarea{ min-height:92px; resize:vertical; }
-
+    textarea{min-height:90px; resize:vertical;}
     .btn{
       width:100%;
-      padding:13px 14px;
       border:none;
-      border-radius:14px;
       cursor:pointer;
-      font-size:16px;
+      padding:13px 14px;
+      border-radius: 14px;
       font-weight:800;
-      background: linear-gradient(135deg, var(--primary), var(--primary2));
-      color:#fff;
-      box-shadow: 0 10px 25px rgba(37,99,235,.20);
-      transition:.2s;
-    }
-    .btn:hover{ transform: translateY(-1px); }
-
-    .note{
-      margin-top:12px;
-      background:#f8fafc;
-      border:1px solid #e2e8f0;
-      padding:12px;
-      border-radius:16px;
-      color:#334155;
       font-size:14px;
+      color:white;
+      background: linear-gradient(90deg, var(--brand), var(--brand2));
+      box-shadow: 0 12px 30px rgba(30,136,255,.22);
+      transition:.15s;
     }
-
-    .success{
+    .btn:active{transform:scale(.99)}
+    .btn.secondary{
+      background:#0b2239;
+      box-shadow:none;
+    }
+    .row{
+      display:flex; gap:10px; align-items:center; flex-wrap:wrap;
+    }
+    .msg{
       margin-top:12px;
-      background: rgba(22,163,74,.10);
-      border:1px solid rgba(22,163,74,.25);
-      padding:12px;
-      border-radius:16px;
-      color:#0f172a;
-      display:none;
-    }
-    .success strong{ color: var(--success); }
-
-    .footer{
-      margin-top:14px;
-      text-align:center;
-      color:rgba(255,255,255,.65);
+      padding:12px 14px;
+      border-radius: 14px;
+      background:#f1f5f9;
+      color:#0b2239;
+      border:1px solid #e2e8f0;
       font-size:13px;
     }
+    .msg.ok{background:#ecfdf5;border-color:#bbf7d0;color:#065f46}
+    .msg.err{background:#fef2f2;border-color:#fecaca;color:#7f1d1d}
+    .footer{
+      padding:14px 18px;
+      text-align:center;
+      color:rgba(255,255,255,.75);
+      font-size:12px;
+    }
+    .mini{
+      font-size:12px;color:var(--muted);
+      margin-top:8px;
+    }
+    .hidden{display:none;}
   </style>
 </head>
 
 <body>
   <div class="wrap">
-
-    <div class="hero">
-      <div class="top">
-        <div class="brand">
-          <div class="logo" aria-hidden="true">
-            <svg viewBox="0 0 24 24">
-              <path d="M4 5a3 3 0 0 1 3-3h10a3 3 0 0 1 3 3v8a3 3 0 0 1-3 3h-4l2 4H9l2-4H7a3 3 0 0 1-3-3V5zm3-1a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1V5a1 1 0 0 0-1-1H7z"/>
-            </svg>
-          </div>
-          <div>
-            <h1>SmartFix Computer Service</h1>
-            <p>Fast • Trusted • Affordable Repair & Support</p>
-          </div>
+    <div class="topbar">
+      <div class="brand">
+        <div class="logo">💻</div>
+        <div>
+          <h1>SmartFix Computer Service</h1>
+          <p>Fast • Trusted • Affordable Repair & Support</p>
         </div>
-
-        <div class="badges">
-          <div class="badge">🛠 PC & Laptop Repair</div>
-          <div class="badge">⚡ Same Day Service</div>
-          <div class="badge">🏠 Home Support</div>
-        </div>
+      </div>
+      <div class="chips">
+        <div class="chip">🛠 PC & Laptop Repair</div>
+        <div class="chip">⚡ Same Day Service</div>
+        <div class="chip">🏠 Home Support</div>
       </div>
     </div>
 
     <div class="card">
       <div class="tabs">
-        <button class="tabbtn active" onclick="showTab('register', this)">Register</button>
-        <button class="tabbtn" onclick="showTab('login', this)">Login</button>
-        <button class="tabbtn" onclick="showTab('booking', this)">Booking</button>
+        <button class="tabbtn active" id="tabRegister" onclick="showTab('register')">Register</button>
+        <button class="tabbtn" id="tabLogin" onclick="showTab('login')">Login</button>
+        <button class="tabbtn" id="tabBooking" onclick="showTab('booking')">Booking</button>
       </div>
 
-      <!-- Register -->
-      <div id="register" class="section active">
-        <div class="titleRow">
-          <div class="titleIcon">
-            <svg viewBox="0 0 24 24"><path d="M12 12a4 4 0 1 0-4-4 4 4 0 0 0 4 4zm0 2c-4.4 0-8 2.2-8 5v1h16v-1c0-2.8-3.6-5-8-5z"/></svg>
+      <div class="content">
+
+        <!-- REGISTER -->
+        <div id="register" class="tab">
+          <div class="title">
+            <div class="icon">👤</div>
+            <h2>Create Account</h2>
           </div>
-          <h2>Create Account</h2>
-        </div>
 
-        <div class="grid">
-          <input type="text" placeholder="Full Name">
-          <input type="text" placeholder="Phone Number">
-        </div>
-        <input type="email" placeholder="Email Address">
-        <input type="password" placeholder="Password">
-
-        <button class="btn" onclick="showSuccess('Account created successfully (Demo).')">Register</button>
-
-        <div class="note">
-          🔔 Demo Mode: This is a design version. Data is not saved yet.
-        </div>
-      </div>
-
-      <!-- Login -->
-      <div id="login" class="section">
-        <div class="titleRow">
-          <div class="titleIcon">
-            <svg viewBox="0 0 24 24"><path d="M10 17v-2h4v2h5V7H5v10h5zm-7 2V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+          <div class="grid">
+            <div class="field">
+              <label>Full Name</label>
+              <input id="r_name" placeholder="Your full name" />
+            </div>
+            <div class="field">
+              <label>Phone Number</label>
+              <input id="r_phone" placeholder="Your phone number" />
+            </div>
+            <div class="field" style="grid-column:1/-1">
+              <label>Email Address</label>
+              <input id="r_email" type="email" placeholder="example@gmail.com" />
+            </div>
+            <div class="field" style="grid-column:1/-1">
+              <label>Password</label>
+              <input id="r_pass" type="password" placeholder="Create a strong password" />
+            </div>
           </div>
-          <h2>Login</h2>
-        </div>
 
-        <input type="email" placeholder="Email Address">
-        <input type="password" placeholder="Password">
-
-        <button class="btn" onclick="showSuccess('Login successful (Demo).')">Login</button>
-
-        <div class="note">
-          🔒 Demo Mode: Login is only for showing the page.
-        </div>
-      </div>
-
-      <!-- Booking -->
-      <div id="booking" class="section">
-        <div class="titleRow">
-          <div class="titleIcon">
-            <svg viewBox="0 0 24 24"><path d="M7 2h2v2h6V2h2v2h3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h3V2zm15 8H2v10a1 1 0 0 0 1 1h18a1 1 0 0 0 1-1V10z"/></svg>
+          <div style="margin-top:12px;">
+            <button class="btn" onclick="registerUser()">Register</button>
+            <div class="mini">After registration, go to Login tab.</div>
+            <div id="r_msg" class="msg hidden"></div>
           </div>
-          <h2>Book a Service Slot</h2>
         </div>
 
-        <div class="grid">
-          <input type="text" placeholder="Customer Name">
-          <input type="text" placeholder="Customer Phone">
+        <!-- LOGIN -->
+        <div id="login" class="tab hidden">
+          <div class="title">
+            <div class="icon">🔐</div>
+            <h2>Login</h2>
+          </div>
+
+          <div class="grid">
+            <div class="field" style="grid-column:1/-1">
+              <label>Email Address</label>
+              <input id="l_email" type="email" placeholder="example@gmail.com" />
+            </div>
+            <div class="field" style="grid-column:1/-1">
+              <label>Password</label>
+              <input id="l_pass" type="password" placeholder="Your password" />
+            </div>
+          </div>
+
+          <div style="margin-top:12px;">
+            <button class="btn" onclick="loginUser()">Login</button>
+            <button class="btn secondary" style="margin-top:10px;" onclick="logoutUser()">Logout</button>
+            <div id="l_msg" class="msg hidden"></div>
+          </div>
         </div>
 
-        <textarea placeholder="Full Address (House, Road, Area, City)"></textarea>
+        <!-- BOOKING -->
+        <div id="booking" class="tab hidden">
+          <div class="title">
+            <div class="icon">📅</div>
+            <h2>Book a Service</h2>
+          </div>
 
-        <select>
-          <option value="">Select Service Type</option>
-          <option>PC Repair</option>
-          <option>Laptop Repair</option>
-          <option>Windows Installation</option>
-          <option>Software Installation</option>
-          <option>Printer Setup</option>
-          <option>Networking / WiFi Setup</option>
-        </select>
+          <div class="grid">
+            <div class="field">
+              <label>Service Type</label>
+              <select id="b_service">
+                <option value="PC Repair">PC Repair</option>
+                <option value="Laptop Repair">Laptop Repair</option>
+                <option value="Windows Install">Windows Install</option>
+                <option value="Virus Removal">Virus Removal</option>
+                <option value="Data Recovery">Data Recovery</option>
+                <option value="Networking / WiFi">Networking / WiFi</option>
+              </select>
+            </div>
+            <div class="field">
+              <label>Preferred Date</label>
+              <input id="b_date" type="date" />
+            </div>
 
-        <div class="grid">
-          <input type="date">
-          <input type="time">
+            <div class="field">
+              <label>Preferred Time</label>
+              <input id="b_time" type="time" />
+            </div>
+
+            <div class="field">
+              <label>Customer Phone</label>
+              <input id="b_phone" placeholder="Your phone number" />
+            </div>
+
+            <div class="field" style="grid-column:1/-1">
+              <label>Address</label>
+              <input id="b_address" placeholder="Full address (Area, City, Landmark)" />
+            </div>
+
+            <div class="field" style="grid-column:1/-1">
+              <label>Problem Details</label>
+              <textarea id="b_details" placeholder="Write your problem details..."></textarea>
+            </div>
+          </div>
+
+          <div style="margin-top:12px;">
+            <button class="btn" onclick="submitBooking()">Submit Booking</button>
+            <div class="mini">⚠️ You must be logged in to book.</div>
+            <div id="b_msg" class="msg hidden"></div>
+          </div>
         </div>
 
-        <textarea placeholder="Problem Details (Optional)"></textarea>
-
-        <button class="btn" onclick="showSuccess('Booking submitted successfully (Demo).')">Confirm Booking</button>
-
-        <div class="note">
-          📌 After upgrade, booking will be saved automatically in database.
-        </div>
-      </div>
-
-      <div class="success" id="successBox">
-        <strong>✅ Success:</strong> <span id="successText"></span>
       </div>
     </div>
 
-    <div class="footer">
-      © <span id="year"></span> SmartFix Computer Service • Powered by GitHub Pages
-    </div>
-
+    <div class="footer">© 2026 SmartFix Computer Service • Powered by GitHub Pages + Firebase</div>
   </div>
 
-<script>
-  document.getElementById("year").innerText = new Date().getFullYear();
+  <!-- Firebase (Module) -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-app.js";
+    import {
+      getAuth,
+      createUserWithEmailAndPassword,
+      signInWithEmailAndPassword,
+      signOut,
+      onAuthStateChanged
+    } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-auth.js";
 
-  function showTab(tabId, btn){
-    document.querySelectorAll(".tabbtn").forEach(b => b.classList.remove("active"));
-    btn.classList.add("active");
+    import {
+      getFirestore,
+      collection,
+      addDoc,
+      serverTimestamp
+    } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore.js";
 
-    document.querySelectorAll(".section").forEach(sec => sec.classList.remove("active"));
-    document.getElementById(tabId).classList.add("active");
+    // Your Firebase config
+    const firebaseConfig = {
+      apiKey: "AIzaSyDL2OFxYzmXKUp5edh6QtD2f5gkb6oZAv4",
+      authDomain: "smartfix-computer-service.firebaseapp.com",
+      projectId: "smartfix-computer-service",
+      storageBucket: "smartfix-computer-service.firebasestorage.app",
+      messagingSenderId: "393720657887",
+      appId: "1:393720657887:web:4501c751f97fd75122766a"
+    };
 
-    document.getElementById("successBox").style.display = "none";
-  }
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
 
-  function showSuccess(text){
-    document.getElementById("successText").innerText = text;
-    document.getElementById("successBox").style.display = "block";
-    window.scrollTo({ top: document.body.scrollHeight, behavior: "smooth" });
-  }
-</script>
+    // UI Helpers
+    window.showTab = (name) => {
+      document.querySelectorAll(".tab").forEach(t => t.classList.add("hidden"));
+      document.getElementById(name).classList.remove("hidden");
 
+      document.querySelectorAll(".tabbtn").forEach(b => b.classList.remove("active"));
+      if(name === "register") document.getElementById("tabRegister").classList.add("active");
+      if(name === "login") document.getElementById("tabLogin").classList.add("active");
+      if(name === "booking") document.getElementById("tabBooking").classList.add("active");
+    };
+
+    function setMsg(id, text, type="ok"){
+      const el = document.getElementById(id);
+      el.classList.remove("hidden","ok","err");
+      el.classList.add(type === "ok" ? "ok" : "err");
+      el.textContent = text;
+    }
+
+    // Register
+    window.registerUser = async () => {
+      const name = document.getElementById("r_name").value.trim();
+      const phone = document.getElementById("r_phone").value.trim();
+      const email = document.getElementById("r_email").value.trim();
+      const pass = document.getElementById("r_pass").value.trim();
+
+      if(!name || !phone || !email || !pass){
+        setMsg("r_msg","Please fill all fields.","err");
+        return;
+      }
+
+      try{
+        await createUserWithEmailAndPassword(auth, email, pass);
+
+        // Save user profile to Firestore
+        await addDoc(collection(db, "users"), {
+          name,
+          phone,
+          email,
+          createdAt: serverTimestamp()
+        });
+
+        setMsg("r_msg","Registration successful! Now go to Login tab.","ok");
+      }catch(e){
+        setMsg("r_msg", e.message, "err");
+      }
+    };
+
+    // Login
+    window.loginUser = async () => {
+      const email = document.getElementById("l_email").value.trim();
+      const pass = document.getElementById("l_pass").value.trim();
+
+      if(!email || !pass){
+        setMsg("l_msg","Enter email & password.","err");
+        return;
+      }
+
+      try{
+        await signInWithEmailAndPassword(auth, email, pass);
+        setMsg("l_msg","Login successful! Now go to Booking tab.","ok");
+      }catch(e){
+        setMsg("l_msg", e.message, "err");
+      }
+    };
+
+    // Logout
+    window.logoutUser = async () => {
+      try{
+        await signOut(auth);
+        setMsg("l_msg","Logged out successfully.","ok");
+      }catch(e){
+        setMsg("l_msg", e.message, "err");
+      }
+    };
+
+    // Booking
+    window.submitBooking = async () => {
+      const user = auth.currentUser;
+      if(!user){
+        setMsg("b_msg","You must login first.","err");
+        showTab("login");
+        return;
+      }
+
+      const service = document.getElementById("b_service").value;
+      const date = document.getElementById("b_date").value;
+      const time = document.getElementById("b_time").value;
+      const phone = document.getElementById("b_phone").value.trim();
+      const address = document.getElementById("b_address").value.trim();
+      const details = document.getElementById("b_details").value.trim();
+
+      if(!date || !time || !phone || !address || !details){
+        setMsg("b_msg","Please fill all booking fields.","err");
+        return;
+      }
+
+      try{
+        await addDoc(collection(db, "bookings"), {
+          userEmail: user.email,
+          service,
+          date,
+          time,
+          phone,
+          address,
+          details,
+          status: "Pending",
+          createdAt: serverTimestamp()
+        });
+
+        setMsg("b_msg","Booking submitted successfully! We will contact you soon.","ok");
+
+        // Clear fields
+        document.getElementById("b_date").value = "";
+        document.getElementById("b_time").value = "";
+        document.getElementById("b_phone").value = "";
+        document.getElementById("b_address").value = "";
+        document.getElementById("b_details").value = "";
+      }catch(e){
+        setMsg("b_msg", e.message, "err");
+      }
+    };
+
+    // Auth watcher
+    onAuthStateChanged(auth, (user) => {
+      // optional: you can auto-switch tabs
+      // console.log("Auth state:", user?.email);
+    });
+  </script>
 </body>
 </html>
