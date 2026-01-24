@@ -4,191 +4,379 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>SmartFix Computer Service</title>
+
   <style>
+    :root{
+      --primary:#2563eb;
+      --primary2:#06b6d4;
+      --dark:#0f172a;
+      --text:#1f2937;
+      --muted:#64748b;
+      --bg:#0b1220;
+      --card:#ffffff;
+      --line:#e5e7eb;
+      --success:#16a34a;
+    }
+
+    *{box-sizing:border-box;}
     body{
-      font-family: Arial, sans-serif;
-      background:#f4f6f9;
-      padding:20px;
-      text-align:center;
-    }
-    .box{
-      max-width:800px;
-      margin:auto;
-      background:white;
-      padding:25px;
-      border-radius:16px;
-      box-shadow:0 0 14px rgba(0,0,0,0.12);
-      text-align:left;
-    }
-    h1{
-      text-align:center;
       margin:0;
-      color:#007bff;
+      font-family: Arial, sans-serif;
+      background: radial-gradient(1200px 600px at 10% 10%, rgba(37,99,235,.35), transparent 60%),
+                  radial-gradient(1000px 500px at 90% 20%, rgba(6,182,212,.30), transparent 55%),
+                  linear-gradient(180deg, #0b1220, #0a0f1c);
+      min-height:100vh;
+      padding:22px;
+      color:#fff;
     }
-    .tagline{
-      text-align:center;
-      color:#333;
-      margin-top:8px;
-      margin-bottom:20px;
+
+    .wrap{
+      max-width:980px;
+      margin:auto;
     }
+
+    /* Header */
+    .hero{
+      background: linear-gradient(135deg, rgba(37,99,235,.18), rgba(6,182,212,.12));
+      border:1px solid rgba(255,255,255,.10);
+      border-radius:22px;
+      padding:22px;
+      box-shadow: 0 18px 60px rgba(0,0,0,.35);
+      backdrop-filter: blur(10px);
+    }
+
+    .top{
+      display:flex;
+      gap:18px;
+      align-items:center;
+      justify-content:space-between;
+      flex-wrap:wrap;
+    }
+
+    .brand{
+      display:flex;
+      gap:14px;
+      align-items:center;
+    }
+
+    .logo{
+      width:52px;
+      height:52px;
+      border-radius:16px;
+      background: linear-gradient(135deg, var(--primary), var(--primary2));
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      box-shadow: 0 10px 25px rgba(37,99,235,.35);
+      flex-shrink:0;
+    }
+
+    .logo svg{ width:28px; height:28px; fill:#fff; }
+
+    .brand h1{
+      margin:0;
+      font-size:26px;
+      letter-spacing:.2px;
+    }
+
+    .brand p{
+      margin:3px 0 0;
+      color:rgba(255,255,255,.75);
+      font-size:14px;
+    }
+
+    .badges{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+    .badge{
+      padding:8px 12px;
+      border-radius:999px;
+      font-size:13px;
+      background: rgba(255,255,255,.08);
+      border:1px solid rgba(255,255,255,.10);
+      color:rgba(255,255,255,.85);
+    }
+
+    /* Main Card */
+    .card{
+      margin-top:18px;
+      background: var(--card);
+      color:var(--text);
+      border-radius:22px;
+      padding:18px;
+      box-shadow: 0 18px 60px rgba(0,0,0,.35);
+      border:1px solid rgba(255,255,255,.06);
+    }
+
     .tabs{
       display:flex;
       gap:10px;
       justify-content:center;
-      margin-bottom:20px;
       flex-wrap:wrap;
+      margin:10px 0 18px;
     }
     .tabbtn{
-      padding:10px 14px;
       border:none;
-      border-radius:10px;
       cursor:pointer;
-      font-weight:bold;
-      background:#e9ecef;
+      padding:12px 16px;
+      border-radius:14px;
+      background:#f1f5f9;
+      color:#0f172a;
+      font-weight:700;
+      min-width:140px;
+      transition:.2s;
     }
+    .tabbtn:hover{ transform: translateY(-1px); }
     .tabbtn.active{
-      background:#007bff;
-      color:white;
+      background: linear-gradient(135deg, var(--primary), var(--primary2));
+      color:#fff;
+      box-shadow: 0 10px 25px rgba(37,99,235,.25);
     }
+
     .section{
       display:none;
+      padding:10px 6px 4px;
     }
-    .section.active{
-      display:block;
+    .section.active{ display:block; }
+
+    .titleRow{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      margin:6px 0 14px;
     }
-    input, select, textarea{
-      width:100%;
-      padding:10px;
-      margin:8px 0;
-      border-radius:10px;
-      border:1px solid #ccc;
-      font-size:15px;
-    }
-    button{
-      width:100%;
-      padding:12px;
-      margin-top:10px;
-      border:none;
+    .titleIcon{
+      width:38px;
+      height:38px;
       border-radius:12px;
-      font-size:16px;
-      cursor:pointer;
-      background:#007bff;
-      color:white;
-      font-weight:bold;
+      background: rgba(37,99,235,.12);
+      display:flex;
+      align-items:center;
+      justify-content:center;
     }
-    button:hover{ background:#0056b3; }
-    .row{
+    .titleIcon svg{ width:20px; height:20px; fill: var(--primary); }
+
+    h2{
+      margin:0;
+      font-size:20px;
+      color:var(--dark);
+    }
+
+    .grid{
       display:grid;
-      grid-template-columns:1fr 1fr;
+      grid-template-columns: 1fr 1fr;
       gap:12px;
     }
-    .info{
-      margin-top:12px;
-      background:#eaf3ff;
-      padding:12px;
-      border-radius:12px;
-      font-size:14px;
-      color:#222;
+    @media(max-width:720px){
+      .grid{ grid-template-columns:1fr; }
+      .tabbtn{ min-width:110px; width:100%; }
     }
+
+    input, select, textarea{
+      width:100%;
+      padding:12px 12px;
+      border-radius:14px;
+      border:1px solid var(--line);
+      font-size:15px;
+      outline:none;
+      transition:.15s;
+      background:#fff;
+    }
+    input:focus, select:focus, textarea:focus{
+      border-color: rgba(37,99,235,.65);
+      box-shadow: 0 0 0 4px rgba(37,99,235,.12);
+    }
+    textarea{ min-height:92px; resize:vertical; }
+
+    .btn{
+      width:100%;
+      padding:13px 14px;
+      border:none;
+      border-radius:14px;
+      cursor:pointer;
+      font-size:16px;
+      font-weight:800;
+      background: linear-gradient(135deg, var(--primary), var(--primary2));
+      color:#fff;
+      box-shadow: 0 10px 25px rgba(37,99,235,.20);
+      transition:.2s;
+    }
+    .btn:hover{ transform: translateY(-1px); }
+
+    .note{
+      margin-top:12px;
+      background:#f8fafc;
+      border:1px solid #e2e8f0;
+      padding:12px;
+      border-radius:16px;
+      color:#334155;
+      font-size:14px;
+    }
+
     .success{
-      background:#d1ffe2;
-      border-left:6px solid #28a745;
+      margin-top:12px;
+      background: rgba(22,163,74,.10);
+      border:1px solid rgba(22,163,74,.25);
+      padding:12px;
+      border-radius:16px;
+      color:#0f172a;
+      display:none;
+    }
+    .success strong{ color: var(--success); }
+
+    .footer{
+      margin-top:14px;
+      text-align:center;
+      color:rgba(255,255,255,.65);
+      font-size:13px;
     }
   </style>
 </head>
+
 <body>
+  <div class="wrap">
 
-  <div class="box">
-    <h1>💻 SmartFix Computer Service</h1>
-    <p class="tagline">Fast • Trusted • Affordable</p>
+    <div class="hero">
+      <div class="top">
+        <div class="brand">
+          <div class="logo" aria-hidden="true">
+            <svg viewBox="0 0 24 24">
+              <path d="M4 5a3 3 0 0 1 3-3h10a3 3 0 0 1 3 3v8a3 3 0 0 1-3 3h-4l2 4H9l2-4H7a3 3 0 0 1-3-3V5zm3-1a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1V5a1 1 0 0 0-1-1H7z"/>
+            </svg>
+          </div>
+          <div>
+            <h1>SmartFix Computer Service</h1>
+            <p>Fast • Trusted • Affordable Repair & Support</p>
+          </div>
+        </div>
 
-    <div class="tabs">
-      <button class="tabbtn active" onclick="showTab('register')">Register</button>
-      <button class="tabbtn" onclick="showTab('login')">Login</button>
-      <button class="tabbtn" onclick="showTab('booking')">Booking</button>
-    </div>
-
-    <!-- Register -->
-    <div id="register" class="section active">
-      <h2>📝 Create Account</h2>
-      <input type="text" placeholder="Full Name">
-      <input type="text" placeholder="Phone Number">
-      <input type="email" placeholder="Email Address">
-      <input type="password" placeholder="Password">
-      <button onclick="demoMsg('Registered successfully (Demo).')">Register</button>
-
-      <div class="info">
-        ⚠️ Demo Version: This registration is only for showing page design.
+        <div class="badges">
+          <div class="badge">🛠 PC & Laptop Repair</div>
+          <div class="badge">⚡ Same Day Service</div>
+          <div class="badge">🏠 Home Support</div>
+        </div>
       </div>
     </div>
 
-    <!-- Login -->
-    <div id="login" class="section">
-      <h2>🔑 Login</h2>
-      <input type="email" placeholder="Email Address">
-      <input type="password" placeholder="Password">
-      <button onclick="demoMsg('Logged in successfully (Demo).')">Login</button>
+    <div class="card">
+      <div class="tabs">
+        <button class="tabbtn active" onclick="showTab('register', this)">Register</button>
+        <button class="tabbtn" onclick="showTab('login', this)">Login</button>
+        <button class="tabbtn" onclick="showTab('booking', this)">Booking</button>
+      </div>
 
-      <div class="info">
-        ⚠️ Demo Version: This login is only for showing page design.
+      <!-- Register -->
+      <div id="register" class="section active">
+        <div class="titleRow">
+          <div class="titleIcon">
+            <svg viewBox="0 0 24 24"><path d="M12 12a4 4 0 1 0-4-4 4 4 0 0 0 4 4zm0 2c-4.4 0-8 2.2-8 5v1h16v-1c0-2.8-3.6-5-8-5z"/></svg>
+          </div>
+          <h2>Create Account</h2>
+        </div>
+
+        <div class="grid">
+          <input type="text" placeholder="Full Name">
+          <input type="text" placeholder="Phone Number">
+        </div>
+        <input type="email" placeholder="Email Address">
+        <input type="password" placeholder="Password">
+
+        <button class="btn" onclick="showSuccess('Account created successfully (Demo).')">Register</button>
+
+        <div class="note">
+          🔔 Demo Mode: This is a design version. Data is not saved yet.
+        </div>
+      </div>
+
+      <!-- Login -->
+      <div id="login" class="section">
+        <div class="titleRow">
+          <div class="titleIcon">
+            <svg viewBox="0 0 24 24"><path d="M10 17v-2h4v2h5V7H5v10h5zm-7 2V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+          </div>
+          <h2>Login</h2>
+        </div>
+
+        <input type="email" placeholder="Email Address">
+        <input type="password" placeholder="Password">
+
+        <button class="btn" onclick="showSuccess('Login successful (Demo).')">Login</button>
+
+        <div class="note">
+          🔒 Demo Mode: Login is only for showing the page.
+        </div>
+      </div>
+
+      <!-- Booking -->
+      <div id="booking" class="section">
+        <div class="titleRow">
+          <div class="titleIcon">
+            <svg viewBox="0 0 24 24"><path d="M7 2h2v2h6V2h2v2h3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h3V2zm15 8H2v10a1 1 0 0 0 1 1h18a1 1 0 0 0 1-1V10z"/></svg>
+          </div>
+          <h2>Book a Service Slot</h2>
+        </div>
+
+        <div class="grid">
+          <input type="text" placeholder="Customer Name">
+          <input type="text" placeholder="Customer Phone">
+        </div>
+
+        <textarea placeholder="Full Address (House, Road, Area, City)"></textarea>
+
+        <select>
+          <option value="">Select Service Type</option>
+          <option>PC Repair</option>
+          <option>Laptop Repair</option>
+          <option>Windows Installation</option>
+          <option>Software Installation</option>
+          <option>Printer Setup</option>
+          <option>Networking / WiFi Setup</option>
+        </select>
+
+        <div class="grid">
+          <input type="date">
+          <input type="time">
+        </div>
+
+        <textarea placeholder="Problem Details (Optional)"></textarea>
+
+        <button class="btn" onclick="showSuccess('Booking submitted successfully (Demo).')">Confirm Booking</button>
+
+        <div class="note">
+          📌 After upgrade, booking will be saved automatically in database.
+        </div>
+      </div>
+
+      <div class="success" id="successBox">
+        <strong>✅ Success:</strong> <span id="successText"></span>
       </div>
     </div>
 
-    <!-- Booking -->
-    <div id="booking" class="section">
-      <h2>📅 Book a Service Slot</h2>
-
-      <div class="row">
-        <input type="text" placeholder="Customer Name">
-        <input type="text" placeholder="Customer Phone">
-      </div>
-
-      <textarea placeholder="Full Address (House, Road, Area, City)"></textarea>
-
-      <select>
-        <option value="">Select Service Type</option>
-        <option>PC Repair</option>
-        <option>Laptop Repair</option>
-        <option>Windows Installation</option>
-        <option>Software Installation</option>
-        <option>Printer Setup</option>
-        <option>Networking / WiFi Setup</option>
-      </select>
-
-      <div class="row">
-        <input type="date">
-        <input type="time">
-      </div>
-
-      <textarea placeholder="Problem Details (Optional)"></textarea>
-
-      <button onclick="demoMsg('Booking submitted (Demo).')">Confirm Booking</button>
-
-      <div id="message" class="info success" style="display:none;"></div>
+    <div class="footer">
+      © <span id="year"></span> SmartFix Computer Service • Powered by GitHub Pages
     </div>
 
   </div>
 
 <script>
-  function showTab(tabId){
-    document.querySelectorAll(".tabbtn").forEach(btn => btn.classList.remove("active"));
+  document.getElementById("year").innerText = new Date().getFullYear();
+
+  function showTab(tabId, btn){
+    document.querySelectorAll(".tabbtn").forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+
     document.querySelectorAll(".section").forEach(sec => sec.classList.remove("active"));
-
-    if(tabId === "register") document.querySelectorAll(".tabbtn")[0].classList.add("active");
-    if(tabId === "login") document.querySelectorAll(".tabbtn")[1].classList.add("active");
-    if(tabId === "booking") document.querySelectorAll(".tabbtn")[2].classList.add("active");
-
     document.getElementById(tabId).classList.add("active");
+
+    document.getElementById("successBox").style.display = "none";
   }
 
-  function demoMsg(text){
-    const msg = document.getElementById("message");
-    if(msg){
-      msg.style.display = "block";
-      msg.innerHTML = "✅ " + text;
-    }else{
-      alert("✅ " + text);
-    }
+  function showSuccess(text){
+    document.getElementById("successText").innerText = text;
+    document.getElementById("successBox").style.display = "block";
+    window.scrollTo({ top: document.body.scrollHeight, behavior: "smooth" });
   }
 </script>
 
