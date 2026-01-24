@@ -1,132 +1,99 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>SmartFix Admin Dashboard</title>
   <style>
-    :root{
-      --bg1:#071a2b;
-      --bg2:#0b2a3f;
-      --card:#ffffff;
-      --text:#0d1721;
-      --muted:#6b7280;
-      --brand:#1e88ff;
-      --brand2:#00c2ff;
-      --shadow: 0 20px 60px rgba(0,0,0,.25);
-      --radius:18px;
-    }
-    *{box-sizing:border-box;font-family:system-ui,Segoe UI,Arial;}
     body{
       margin:0;
-      min-height:100vh;
-      background: radial-gradient(1200px 600px at 20% 10%, #143a66 0%, transparent 60%),
-                  radial-gradient(900px 500px at 80% 20%, #0a6aa6 0%, transparent 55%),
-                  linear-gradient(180deg, var(--bg1), #030b14 70%);
-      padding:22px;
-      color:#fff;
+      font-family: Arial, sans-serif;
+      background: linear-gradient(120deg,#061a2b,#0b3b57,#061a2b);
+      color:#111;
+      padding:20px;
     }
-    .wrap{max-width:1100px;margin:0 auto;}
-    .topbar{
-      display:flex;align-items:center;justify-content:space-between;gap:12px;
-      background: rgba(255,255,255,.08);
-      border:1px solid rgba(255,255,255,.12);
-      border-radius: 20px;
-      padding:16px;
-      box-shadow: var(--shadow);
-      backdrop-filter: blur(8px);
+    .wrap{
+      max-width:1100px;
+      margin:auto;
+      background:#fff;
+      border-radius:20px;
+      padding:20px;
+      box-shadow:0 10px 30px rgba(0,0,0,.3);
     }
-    .topbar h1{margin:0;font-size:20px}
-    .topbar p{margin:4px 0 0;color:rgba(255,255,255,.75);font-size:12px}
-    .btn{
-      border:none;cursor:pointer;
-      padding:10px 14px;border-radius: 14px;
-      font-weight:800;
-      color:white;
-      background: linear-gradient(90deg, var(--brand), var(--brand2));
+    h1{
+      margin:0 0 10px;
+      color:#0d47a1;
     }
-    .card{
-      margin-top:16px;
-      background: rgba(255,255,255,.95);
-      color:var(--text);
-      border-radius: 22px;
-      box-shadow: var(--shadow);
-      padding:16px;
-      overflow:auto;
-    }
+    p{margin:0 0 15px; color:#333;}
     table{
       width:100%;
       border-collapse:collapse;
-      min-width:900px;
+      margin-top:15px;
+      display:none;
     }
     th, td{
-      border-bottom:1px solid #e5e7eb;
-      padding:10px 8px;
+      padding:10px;
+      border:1px solid #ddd;
       text-align:left;
-      font-size:13px;
-      vertical-align:top;
+      font-size:14px;
     }
-    th{font-size:12px;color:#334155;background:#f8fafc;position:sticky;top:0}
-    .muted{color:var(--muted);font-size:12px}
+    th{
+      background:#0d47a1;
+      color:white;
+    }
     .status{
-      display:inline-block;
-      padding:5px 10px;
-      border-radius:999px;
-      font-size:12px;
-      background:#eef2ff;
-      color:#1e40af;
-      border:1px solid #c7d2fe;
+      font-weight:bold;
+      padding:4px 10px;
+      border-radius:10px;
+      background:#ffcc80;
     }
-    .footer{
-      text-align:center;
-      margin-top:14px;
-      color:rgba(255,255,255,.7);
-      font-size:12px;
+    .info{
+      margin-top:10px;
+      font-weight:bold;
+      color:#444;
+    }
+    .btn{
+      padding:10px 15px;
+      border:none;
+      border-radius:10px;
+      background:linear-gradient(90deg,#0d47a1,#00acc1);
+      color:white;
+      font-weight:bold;
+      cursor:pointer;
+      margin-top:10px;
     }
   </style>
 </head>
-
 <body>
   <div class="wrap">
-    <div class="topbar">
-      <div>
-        <h1>📌 SmartFix Admin Dashboard</h1>
-        <p>View all customer bookings (Firestore)</p>
-      </div>
-      <button class="btn" onclick="loadBookings()">🔄 Refresh</button>
-    </div>
+    <h1>📌 SmartFix Admin Dashboard</h1>
+    <p>All customer bookings will appear here.</p>
 
-    <div class="card">
-      <div class="muted" id="info">Loading bookings...</div>
-      <table id="table" style="margin-top:10px; display:none;">
-        <thead>
-          <tr>
-            <th>#</th>
-            <th>Date/Time</th>
-            <th>Service</th>
-            <th>User Email</th>
-            <th>Phone</th>
-            <th>Address</th>
-            <th>Details</th>
-            <th>Status</th>
-          </tr>
-        </thead>
-        <tbody id="tbody"></tbody>
-      </table>
-    </div>
+    <button class="btn" onclick="loadBookings()">🔄 Refresh Bookings</button>
+    <div class="info" id="info"></div>
 
-    <div class="footer">© 2026 SmartFix Computer Service</div>
+    <table id="table">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Date</th>
+          <th>Time</th>
+          <th>Service</th>
+          <th>User Email</th>
+          <th>Phone</th>
+          <th>Address</th>
+          <th>Details</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody id="tbody"></tbody>
+    </table>
   </div>
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-app.js";
-    import {
-      getFirestore,
-      collection,
-      getDocs,
-      query,
-      orderBy
-    } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore.js";
+    import { getFirestore, collection, getDocs, query, orderBy } 
+      from "https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyDL2OFxYzmXKUp5edh6QtD2f5gkb6oZAv4",
@@ -140,27 +107,34 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
-    const info = document.getElementById("info");
-    const table = document.getElementById("table");
-    const tbody = document.getElementById("tbody");
+    window.loadBookings = async function(){
+      const tbody = document.getElementById("tbody");
+      const info = document.getElementById("info");
+      const table = document.getElementById("table");
 
-    window.loadBookings = async () => {
-      info.textContent = "Loading bookings...";
-      table.style.display = "none";
       tbody.innerHTML = "";
+      info.textContent = "Loading bookings...";
 
       try{
-        const q = query(collection(db, "bookings"), orderBy("createdAt", "desc"));
+        const q = query(collection(db,"bookings"), orderBy("createdAt","desc"));
         const snap = await getDocs(q);
 
-        let i = 1;
-        snap.forEach(doc => {
-          const b = doc.data();
-          const tr = document.createElement("tr");
+        if(snap.empty){
+          info.textContent = "No bookings found!";
+          table.style.display="none";
+          return;
+        }
 
+        let i=0;
+        snap.forEach((doc)=>{
+          i++;
+          const b = doc.data();
+
+          const tr = document.createElement("tr");
           tr.innerHTML = `
-            <td>${i++}</td>
-            <td>${(b.date || "")} ${(b.time || "")}</td>
+            <td>${i}</td>
+            <td>${b.date || ""}</td>
+            <td>${b.time || ""}</td>
             <td>${b.service || ""}</td>
             <td>${b.userEmail || ""}</td>
             <td>${b.phone || ""}</td>
@@ -172,11 +146,11 @@
         });
 
         info.textContent = `Total bookings: ${snap.size}`;
-        table.style.display = "table";
+        table.style.display="table";
       }catch(e){
         info.textContent = "Error: " + e.message;
       }
-    };
+    }
 
     loadBookings();
   </script>
