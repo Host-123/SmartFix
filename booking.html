@@ -76,91 +76,93 @@ button:hover{opacity:.9}
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-app.js";
 import { 
-  getFirestore, 
-  collection, 
-  addDoc, 
-  serverTimestamp,
-  onSnapshot,
-  query,
-  where
+  getFirestore, collection, addDoc, serverTimestamp,
+  query, where, onSnapshot 
 } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore.js";
 
-/* Firebase config */
 const firebaseConfig = {
   apiKey: "AIzaSyDL2OFxYzmxKUp5edh6QtD2f5gkb6oZAv4",
   authDomain: "smartfix-computer-service.firebaseapp.com",
-  projectId: "smartfix-computer-service"
+  projectId: "smartfix-computer-service",
 };
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-const phoneInput = document.getElementById("phone");
-const statusBox = document.getElementById("statusBox");
+/* ================= SUBMIT BOOKING ================= */
 
-/* SUBMIT BOOKING */
 document.getElementById("bookingForm").addEventListener("submit", async (e)=>{
   e.preventDefault();
 
-  const data = {
-  name: document.getElementById("name").value || "",
-  phone: document.getElementById("phone").value || "",
-  address: document.getElementById("address").value || "",
-  service: document.getElementById("service").value || "",
-  problem: document.getElementById("problem").value || "",
-  date: document.getElementById("date").value || "",
-  time: document.getElementById("time").value || "",
-  status: "Pending",
-  createdAt: serverTimestamp()
-};
+  const phone = document.getElementById("phone").value.trim();
 
+  const data = {
+    name: document.getElementById("name").value,
+    phone: phone,
+    address: document.getElementById("address").value,
+    service: document.getElementById("service").value,
+    problem: document.getElementById("problem").value,
+    date: document.getElementById("date").value,
+    time: document.getElementById("time").value,
+    status: "Pending",
+    createdAt: serverTimestamp()
+  };
 
   try{
     await addDoc(collection(db,"bookings"), data);
-    msg.innerHTML = "✅ Booking successful!";
-    loadStatus(phone.value);
+    document.getElementById("msg").innerHTML = "✅ Booking successful!";
+    loadHistory(phone);
     e.target.reset();
   }catch(err){
-    msg.innerHTML = "❌ " + err.message;
+    document.getElementById("msg").innerHTML = "❌ " + err.message;
   }
 });
 
-/* LIVE STATUS */
-function loadStatus(phone){
+/* ================= CUSTOMER HISTORY ================= */
+
+const phoneInput = document.getElementById("phone");
+const statusBox = document.getElementById("statusBox");
+
+function loadHistory(phone){
   if(!phone) return;
 
-  const q = query(collection(db,"bookings"), where("phone","==",phone));
+  const q = query(
+    collection(db,"bookings"),
+    where("phone","==",phone)
+  );
 
-  onSnapshot(q, snap=>{
+  onSnapshot(q,(snap)=>{
     if(snap.empty){
-      statusBox.innerHTML = "❌ No booking found";
+      statusBox.innerHTML = "❌ No bookings found";
       return;
     }
 
     let html = "";
     snap.forEach(doc=>{
       const b = doc.data();
+      const color =
+        b.status==="Completed" ? "green" :
+        b.status==="Cancelled" ? "red" : "orange";
+
       html += `
-      <div style="border:1px solid #ccc;padding:10px;margin-bottom:8px;border-radius:6px">
-        <b>Service:</b> ${b.service}<br>
-        <b>Date:</b> ${b.date} ${b.time}<br>
-        <b>Status:</b>
-        <span style="
-          padding:4px 10px;
-          border-radius:20px;
-          color:white;
-          background:${b.status==="Completed"?"green":b.status==="Cancelled"?"red":"orange"};
-        ">
-          ${b.status}
-        </span>
-      </div>`;
+        <div style="border:1px solid #ccc;padding:10px;margin-bottom:10px;border-radius:8px">
+          <b>Service:</b> ${b.service}<br>
+          <b>Date:</b> ${b.date} ${b.time}<br>
+          <b>Problem:</b> ${b.problem || "-"}<br>
+          <b>Status:</b> 
+          <span style="background:${color};color:white;padding:4px 12px;border-radius:20px">
+            ${b.status}
+          </span>
+        </div>
+      `;
     });
+
     statusBox.innerHTML = html;
   });
 }
 
-phoneInput.addEventListener("change",()=>{
-  loadStatus(phoneInput.value.trim());
+phoneInput.addEventListener("change", ()=>{
+  loadHistory(phoneInput.value.trim());
 });
 </script>
 
