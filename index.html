@@ -197,3 +197,49 @@ window.showSection=(id)=>{
 
 </body>
 </html>
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+  import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword } 
+    from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
+
+  // 🔥 Your Firebase Config (EXACT same)
+  const firebaseConfig = {
+    apiKey: "AIzaSyDL20FxYzmxKUp5edh6QtD2f5gkb6oZAv4",
+    authDomain: "smartfix-computer-service.firebaseapp.com",
+    projectId: "smartfix-computer-service",
+    storageBucket: "smartfix-computer-service.appspot.com",
+    messagingSenderId: "393720657887",
+    appId: "1:393720657887:web:4501c751f97fd75122766a"
+  };
+
+  // Initialize Firebase
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+
+  // Login
+  window.loginUser = async () => {
+    const email = document.getElementById("email").value;
+    const password = document.getElementById("password").value;
+
+    try {
+      await signInWithEmailAndPassword(auth, email, password);
+      alert("Login successful");
+      // redirect later
+    } catch (err) {
+      alert(err.message);
+    }
+  };
+
+  // Register
+  window.registerUser = async () => {
+    const email = document.getElementById("email").value;
+    const password = document.getElementById("password").value;
+
+    try {
+      await createUserWithEmailAndPassword(auth, email, password);
+      alert("Registration successful");
+    } catch (err) {
+      alert(err.message);
+    }
+  };
+</script>
