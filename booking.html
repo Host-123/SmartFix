@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>SmartFix Booking</title>
+
+<style>
+body{
+  margin:0;
+  font-family:Arial;
+  background:linear-gradient(135deg,#0f2027,#203a43,#2c5364);
+}
+.header{
+  background:#1877f2;
+  color:#fff;
+  padding:20px;
+  text-align:center;
+}
+.container{
+  max-width:600px;
+  margin:30px auto;
+  background:#fff;
+  padding:25px;
+  border-radius:10px;
+}
+input,select,textarea{
+  width:100%;
+  padding:10px;
+  margin:8px 0;
+}
+button{
+  background:#1877f2;
+  color:#fff;
+  border:none;
+  padding:12px;
+  width:100%;
+  border-radius:6px;
+  cursor:pointer;
+}
+.status{
+  margin-top:20px;
+  background:#f1f1f1;
+  padding:15px;
+  border-radius:6px;
+}
+.logout{
+  background:#e74c3c;
+  margin-top:10px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="header">
+  <h2>📋 SmartFix Booking Panel</h2>
+  <p>Create & Track Your Service Booking</p>
+</div>
+
+<div class="container">
+
+<h3>New Booking</h3>
+
+<input id="name" placeholder="Your Name">
+<input id="phone" placeholder="Phone Number">
+<input id="address" placeholder="Address">
+
+<select id="service">
+  <option>PC Repair</option>
+  <option>Laptop Repair</option>
+  <option>Windows Install</option>
+  <option>Printer Service</option>
+</select>
+
+<textarea id="problem" placeholder="Problem details"></textarea>
+<input type="date" id="date">
+<input type="time" id="time">
+
+<button onclick="submitBooking()">Submit Booking</button>
+
+<div class="status">
+  <h4>📌 Booking Status</h4>
+  <p>Status: <b>Pending</b></p>
+</div>
+
+<button class="logout" onclick="logout()">Logout</button>
+
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-app.js";
+import { getAuth, signOut } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-auth.js";
+import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyDL2OFxYzmxKUp5edh6QtD2f5gkb6oZAv4",
+  authDomain: "smartfix-computer-service.firebaseapp.com",
+  projectId: "smartfix-computer-service",
+  storageBucket: "smartfix-computer-service.appspot.com",
+  messagingSenderId: "393720657887",
+  appId: "1:393720657887:web:4501c751f97fd75122766a"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+window.submitBooking = async ()=>{
+  await addDoc(collection(db,"bookings"),{
+    name:name.value,
+    phone:phone.value,
+    address:address.value,
+    service:service.value,
+    problem:problem.value,
+    date:date.value,
+    time:time.value,
+    status:"Pending"
+  });
+  alert("✅ Booking Submitted Successfully!");
+}
+
+window.logout = ()=>{
+  signOut(auth).then(()=>{
+    window.location.href="index.html";
+  });
+}
+</script>
+
+</body>
+</html>
