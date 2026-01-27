@@ -1,198 +1,146 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>SmartFix Computer Service</title>
-<meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="UTF-8" />
+  <title>SmartFix Computer Service</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-<style>
-body{
-  font-family:Arial;
-  background:linear-gradient(120deg,#0f2027,#203a43,#2c5364);
-  margin:0;
-}
-header{
-  background:#0d6efd;
-  color:#fff;
-  padding:15px;
-  text-align:center;
-}
-.container{
-  max-width:900px;
-  margin:20px auto;
-  background:#fff;
-  padding:20px;
-  border-radius:12px;
-}
-.hidden{display:none;}
-input,select,textarea{
-  width:100%;
-  padding:10px;
-  margin:6px 0;
-}
-button{
-  padding:8px 14px;
-  border:none;
-  border-radius:20px;
-  background:#0d6efd;
-  color:#fff;
-  cursor:pointer;
-}
-.card{
-  border:1px solid #ddd;
-  border-radius:8px;
-  padding:12px;
-  margin-top:10px;
-}
-.status{
-  padding:4px 10px;
-  border-radius:12px;
-  color:#fff;
-}
-.Pending{background:#ffc107;color:#000;}
-.Completed{background:#28a745;}
-.Cancelled{background:#dc3545;}
-.Received{background:#0dcaf0;}
-nav button{margin-right:6px;}
-</style>
+  <style>
+    body{
+      margin:0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: linear-gradient(135deg,#0f2027,#203a43,#2c5364);
+      color:#333;
+    }
+    header{
+      background:#0d6efd;
+      color:#fff;
+      padding:30px;
+      text-align:center;
+    }
+    .box{
+      max-width:700px;
+      margin:40px auto;
+      background:#fff;
+      border-radius:12px;
+      padding:30px;
+      box-shadow:0 10px 30px rgba(0,0,0,.3);
+    }
+    h2{margin-top:0}
+    input{
+      width:100%;
+      padding:12px;
+      margin:10px 0;
+      border:1px solid #ccc;
+      border-radius:6px;
+      font-size:15px;
+    }
+    button{
+      padding:10px 18px;
+      border:none;
+      border-radius:20px;
+      background:#0d6efd;
+      color:#fff;
+      font-size:14px;
+      cursor:pointer;
+      margin-right:10px;
+    }
+    button:hover{opacity:.9}
+    .msg{
+      margin-top:15px;
+      font-weight:bold;
+    }
+    footer{
+      text-align:center;
+      color:#fff;
+      padding:20px;
+      font-size:14px;
+    }
+  </style>
 </head>
 
 <body>
 
 <header>
-<h2>👤 SmartFix Customer Portal</h2>
-<p>Manage your service bookings easily</p>
+  <h1>💻 SmartFix Computer Service</h1>
+  <p>Fast • Trusted • Affordable Repair & Support</p>
 </header>
 
-<div class="container">
+<div class="box">
+  <h2>Login / New Register</h2>
 
-<!-- LOGIN / REGISTER -->
-<div id="authBox">
-  <h3>Login / Register</h3>
+  <!-- REGISTER -->
+  <input id="name" placeholder="Full Name (for new user)">
+  <input id="phone" placeholder="Phone Number (for new user)">
   <input id="email" placeholder="Email">
   <input id="password" type="password" placeholder="Password">
+
   <button onclick="login()">Login</button>
-  <button onclick="register()">Register</button>
-  <p id="authMsg"></p>
+  <button onclick="register()">New Register</button>
+
+  <div id="msg" class="msg"></div>
 </div>
 
-<!-- DASHBOARD -->
-<div id="dashboard" class="hidden">
-  <nav>
-    <button onclick="showSection('newBooking')">➕ New Booking</button>
-    <button onclick="showSection('myBookings')">📋 My Bookings</button>
-    <button onclick="logout()">Logout</button>
-  </nav>
+<footer>
+  © 2026 SmartFix Computer Service • Powered by GitHub Pages + Firebase
+</footer>
 
-  <!-- NEW BOOKING -->
-  <div id="newBooking" class="section">
-    <h3>New Booking</h3>
-    <input id="bService" placeholder="Service (Laptop / PC / Windows)">
-    <textarea id="bProblem" placeholder="Problem details"></textarea>
-    <input type="date" id="bDate">
-    <input type="time" id="bTime">
-    <button onclick="book()">Submit Booking</button>
-    <p id="bookMsg"></p>
-  </div>
-
-  <!-- MY BOOKINGS -->
-  <div id="myBookings" class="section hidden">
-    <h3>My Bookings</h3>
-    <div id="bookingList">Loading...</div>
-  </div>
-</div>
-
-</div>
-
+<!-- 🔥 FIREBASE CDN -->
 <script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-app.js";
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } 
-from "https://www.gstatic.com/firebasejs/12.8.0/firebase-auth.js";
-import { getFirestore, collection, addDoc, query, where, getDocs } 
-from "https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore.js";
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-app.js";
+  import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } 
+    from "https://www.gstatic.com/firebasejs/12.8.0/firebase-auth.js";
+  import { getFirestore, doc, setDoc } 
+    from "https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore.js";
 
-const firebaseConfig = {
-  apiKey: "AIzaSyDL2OFxYzmxKUp5edh6QtD2f5gkb6oZAv4",
-  authDomain: "smartfix-computer-service.firebaseapp.com",
-  projectId: "smartfix-computer-service",
-  storageBucket: "smartfix-computer-service.appspot.com",
-  messagingSenderId: "393720657887",
-  appId: "1:393720657887:web:4501c751f97fd75122766a"
-};
+  // 🔑 YOUR FIREBASE CONFIG
+  const firebaseConfig = {
+    apiKey: "AIzaSyDL2OFxYzmxKUp5edh6QtD2f5gkb6oZAv4",
+    authDomain: "smartfix-computer-service.firebaseapp.com",
+    projectId: "smartfix-computer-service",
+    storageBucket: "smartfix-computer-service.firebasestorage.app",
+    messagingSenderId: "393720657887",
+    appId: "1:393720657887:web:4501c751f97fd75122766a"
+  };
 
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getFirestore(app);
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getFirestore(app);
 
-const authBox = document.getElementById("authBox");
-const dash = document.getElementById("dashboard");
+  // ✅ REGISTER
+  window.register = async () => {
+    const name = document.getElementById("name").value;
+    const phone = document.getElementById("phone").value;
+    const email = document.getElementById("email").value;
+    const password = document.getElementById("password").value;
 
-window.register = async ()=>{
-  try{
-    await createUserWithEmailAndPassword(auth,email.value,password.value);
-    authMsg.innerText="Registered successfully!";
-  }catch(e){authMsg.innerText=e.message;}
-};
+    try {
+      const userCred = await createUserWithEmailAndPassword(auth,email,password);
+      await setDoc(doc(db,"users",userCred.user.uid),{
+        name, phone, email, created:new Date()
+      });
+      msg.innerText = "✅ Registration successful!";
+      msg.style.color="green";
+    } catch(e){
+      msg.innerText = "❌ " + e.message;
+      msg.style.color="red";
+    }
+  };
 
-window.login = async ()=>{
-  try{
-    await signInWithEmailAndPassword(auth,email.value,password.value);
-  }catch(e){authMsg.innerText=e.message;}
-};
+  // ✅ LOGIN
+  window.login = async () => {
+    const email = document.getElementById("email").value;
+    const password = document.getElementById("password").value;
 
-window.logout = async ()=>{
-  await signOut(auth);
-};
-
-onAuthStateChanged(auth,user=>{
-  if(user){
-    authBox.classList.add("hidden");
-    dash.classList.remove("hidden");
-    loadBookings();
-  }else{
-    authBox.classList.remove("hidden");
-    dash.classList.add("hidden");
-  }
-});
-
-window.book = async ()=>{
-  await addDoc(collection(db,"bookings"),{
-    userEmail:auth.currentUser.email,
-    service:bService.value,
-    problem:bProblem.value,
-    date:bDate.value,
-    time:bTime.value,
-    status:"Pending"
-  });
-  bookMsg.innerText="Booking submitted!";
-  loadBookings();
-};
-
-async function loadBookings(){
-  const list=document.getElementById("bookingList");
-  list.innerHTML="";
-  const q=query(collection(db,"bookings"),where("userEmail","==",auth.currentUser.email));
-  const snap=await getDocs(q);
-
-  if(snap.empty){list.innerText="No bookings yet";return;}
-
-  snap.forEach(d=>{
-    const b=d.data();
-    list.innerHTML+=`
-    <div class="card">
-      <b>${b.service}</b><br>
-      ${b.date} ${b.time}<br>
-      <span class="status ${b.status}">${b.status}</span>
-      ${b.status==="Cancelled"?`<p>Reason: ${b.cancelReason}</p>`:""}
-      ${b.status==="Completed"?`<textarea placeholder="Feedback"></textarea><button>Submit Feedback</button>`:""}
-    </div>`;
-  });
-}
-
-window.showSection=(id)=>{
-  document.querySelectorAll(".section").forEach(s=>s.classList.add("hidden"));
-  document.getElementById(id).classList.remove("hidden");
-};
+    try {
+      await signInWithEmailAndPassword(auth,email,password);
+      msg.innerText = "✅ Login successful!";
+      msg.style.color="green";
+    } catch(e){
+      msg.innerText = "❌ " + e.message;
+      msg.style.color="red";
+    }
+  };
 </script>
 
 </body>
