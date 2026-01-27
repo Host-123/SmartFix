@@ -2,70 +2,56 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>SmartFix Booking</title>
+<title>SmartFix Computer Service – Booking</title>
 
 <style>
 body{
+  font-family: Arial, sans-serif;
+  background: linear-gradient(135deg,#0f2027,#203a43,#2c5364);
   margin:0;
-  font-family:Arial;
-  background:linear-gradient(135deg,#0f2027,#203a43,#2c5364);
+  padding:40px;
 }
-.header{
-  background:#1877f2;
-  color:#fff;
-  padding:20px;
-  text-align:center;
-}
-.container{
-  max-width:600px;
-  margin:30px auto;
+.card{
   background:#fff;
+  max-width:520px;
+  margin:auto;
   padding:25px;
   border-radius:10px;
 }
-input,select,textarea{
+h2{margin-top:0}
+input,select,textarea,button{
   width:100%;
   padding:10px;
   margin:8px 0;
+  font-size:15px;
 }
 button{
-  background:#1877f2;
+  background:#0a74ff;
   color:#fff;
   border:none;
-  padding:12px;
-  width:100%;
-  border-radius:6px;
   cursor:pointer;
 }
-.status{
-  margin-top:20px;
-  background:#f1f1f1;
-  padding:15px;
-  border-radius:6px;
-}
-.logout{
-  background:#e74c3c;
+button:hover{opacity:.9}
+#msg{
   margin-top:10px;
+  font-weight:bold;
 }
 </style>
 </head>
 
 <body>
 
-<div class="header">
-  <h2>📋 SmartFix Booking Panel</h2>
-  <p>Create & Track Your Service Booking</p>
-</div>
+<div class="card">
+<h2>🔧 New Booking</h2>
 
-<div class="container">
+<form id="bookingForm">
 
-<h3>New Booking</h3>
+<input id="name" placeholder="Full Name" required>
+<input id="phone" placeholder="Phone Number" required>
+<input id="address" placeholder="Address" required>
 
-<input id="name" placeholder="Your Name">
-<input id="phone" placeholder="Phone Number">
-<input id="address" placeholder="Address">
-
-<select id="service">
+<select id="service" required>
+  <option value="">Select Service</option>
   <option>PC Repair</option>
   <option>Laptop Repair</option>
   <option>Windows Install</option>
@@ -74,57 +60,60 @@ button{
 </select>
 
 <textarea id="problem" placeholder="Problem details"></textarea>
-<input type="date" id="date">
-<input type="time" id="time">
 
-<button onclick="submitBooking()">Submit Booking</button>
+<input type="date" id="date" required>
+<input type="time" id="time" required>
 
-<div class="status">
-  <h4>📌 Booking Status</h4>
-  <p>Status: <b>Pending</b></p>
+<button type="submit">Submit Booking</button>
+</form>
+
+<div id="msg"></div>
 </div>
 
-<button class="logout" onclick="logout()">Logout</button>
-
-</div>
-
+<!-- ================= FIREBASE ================= -->
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-app.js";
-import { getAuth, signOut } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-auth.js";
-import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore.js";
+import { getFirestore, collection, addDoc, serverTimestamp }
+from "https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyDL2OFxYzmxKUp5edh6QtD2f5gkb6oZAv4",
   authDomain: "smartfix-computer-service.firebaseapp.com",
   projectId: "smartfix-computer-service",
-  storageBucket: "smartfix-computer-service.appspot.com",
-  messagingSenderId: "393720657887",
-  appId: "1:393720657887:web:4501c751f97fd75122766a"
 };
 
 const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
 const db = getFirestore(app);
 
-window.submitBooking = async ()=>{
-  await addDoc(collection(db,"bookings"),{
-    name:name.value,
-    phone:phone.value,
-    address:address.value,
-    service:service.value,
-    problem:problem.value,
-    date:date.value,
-    time:time.value,
-    status:"Pending"
-  });
-  alert("✅ Booking Submitted Successfully!");
-}
+const form = document.getElementById("bookingForm");
+const msg  = document.getElementById("msg");
 
-window.logout = ()=>{
-  signOut(auth).then(()=>{
-    window.location.href="index.html";
-  });
-}
+form.addEventListener("submit", async (e)=>{
+  e.preventDefault();
+
+  msg.innerHTML = "⏳ Saving booking...";
+
+  try{
+    await addDoc(collection(db,"bookings"),{
+      name: name.value,
+      phone: phone.value,
+      address: address.value,
+      service: service.value,
+      problem: problem.value,
+      date: date.value,
+      time: time.value,
+      status: "Pending",
+      createdAt: serverTimestamp()
+    });
+
+    msg.innerHTML = "✅ Booking submitted successfully!";
+    form.reset();
+
+  }catch(err){
+    msg.innerHTML = "❌ " + err.message;
+    console.error(err);
+  }
+});
 </script>
 
 </body>
