@@ -85,36 +85,32 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-const form = document.getElementById("bookingForm");
-const msg  = document.getElementById("msg");
-
-form.addEventListener("submit", async (e)=>{
+document.getElementById("bookingForm").addEventListener("submit", async (e)=>{
   e.preventDefault();
 
-  msg.innerHTML = "⏳ Saving booking...";
+  const data = {
+    name: document.getElementById("name").value || "",
+    phone: document.getElementById("phone").value || "",
+    address: document.getElementById("address").value || "",
+    service: document.getElementById("service").value || "",
+    problem: document.getElementById("problem").value || "",
+    date: document.getElementById("date").value || "",
+    time: document.getElementById("time").value || "",
+    status: "Pending",
+    createdAt: serverTimestamp()
+  };
 
   try{
-    await addDoc(collection(db,"bookings"),{
-      name: name.value,
-      phone: phone.value,
-      address: address.value,
-      service: service.value,
-      problem: problem.value,
-      date: date.value,
-      time: time.value,
-      status: "Pending",
-      createdAt: serverTimestamp()
-    });
-
-    msg.innerHTML = "✅ Booking submitted successfully!";
-    form.reset();
-
+    await addDoc(collection(db,"bookings"), data);
+    document.getElementById("msg").innerHTML = "✅ Booking successful!";
+    e.target.reset();
   }catch(err){
-    msg.innerHTML = "❌ " + err.message;
+    document.getElementById("msg").innerHTML = "❌ " + err.message;
     console.error(err);
   }
 });
 </script>
+
 
 </body>
 </html>
