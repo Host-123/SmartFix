@@ -103,16 +103,17 @@ document.getElementById("bookingForm").addEventListener("submit", async (e)=>{
   e.preventDefault();
 
   const data = {
-    name: name.value,
-    phone: phone.value,
-    address: address.value,
-    service: service.value,
-    problem: problem.value,
-    date: date.value,
-    time: time.value,
-    status: "Pending",
-    createdAt: serverTimestamp()
-  };
+  name: document.getElementById("name").value || "",
+  phone: document.getElementById("phone").value || "",
+  address: document.getElementById("address").value || "",
+  service: document.getElementById("service").value || "",
+  problem: document.getElementById("problem").value || "",
+  date: document.getElementById("date").value || "",
+  time: document.getElementById("time").value || "",
+  status: "Pending",
+  createdAt: serverTimestamp()
+};
+
 
   try{
     await addDoc(collection(db,"bookings"), data);
