@@ -3,198 +3,155 @@
 <head>
 <meta charset="UTF-8">
 <title>SmartFix Computer Service</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
 body{
   margin:0;
-  font-family:Arial, sans-serif;
+  font-family:Arial;
   background:linear-gradient(135deg,#0f2027,#203a43,#2c5364);
-  color:#333;
 }
-header{
-  background:#0d6efd;
+.header{
+  background:#1877f2;
   color:#fff;
-  padding:20px;
+  padding:25px;
   text-align:center;
 }
 .container{
-  max-width:900px;
-  margin:30px auto;
+  max-width:520px;
+  margin:40px auto;
   background:#fff;
-  border-radius:10px;
   padding:25px;
+  border-radius:10px;
 }
-input,textarea,select{
+.tabs{
+  display:flex;
+  gap:10px;
+  margin-bottom:20px;
+}
+.tabs button{
+  flex:1;
+  padding:10px;
+  border:none;
+  border-radius:6px;
+  cursor:pointer;
+  font-weight:bold;
+}
+.active{
+  background:#1877f2;
+  color:#fff;
+}
+input{
   width:100%;
   padding:10px;
   margin:8px 0;
 }
-button{
-  padding:10px 20px;
-  border:none;
-  border-radius:6px;
-  background:#0d6efd;
+.btn{
+  background:#1877f2;
   color:#fff;
+  border:none;
+  padding:12px;
+  width:100%;
+  border-radius:6px;
   cursor:pointer;
 }
-button:hover{opacity:.9}
-.hidden{display:none}
-.status{
-  padding:6px 10px;
-  border-radius:12px;
-  font-size:13px;
-  color:#fff;
+.msg{
+  margin-top:10px;
+  font-weight:bold;
 }
-.Pending{background:orange}
-.Completed{background:green}
-.Cancelled{background:red}
+.hide{display:none;}
 </style>
 </head>
 
 <body>
 
-<header>
-  <h1>👤 SmartFix Computer Service</h1>
-  <p>Customer Portal</p>
-</header>
+<div class="header">
+  <h1>💻 SmartFix Computer Service</h1>
+  <p>Fast • Trusted • Affordable Repair</p>
+</div>
 
 <div class="container">
 
-<!-- LOGIN / REGISTER -->
-<div id="authBox">
-<h2>Login / New Register</h2>
-
-<input id="name" placeholder="Full Name (only for new user)">
-<input id="phone" placeholder="Phone Number (only for new user)">
-<input id="email" placeholder="Email">
-<input id="password" type="password" placeholder="Password">
-
-<button onclick="login()">Login</button>
-<button onclick="register()">New Register</button>
-
-<p id="msg"></p>
+<div class="tabs">
+  <button id="loginTab" class="active" onclick="showLogin()">🔐 Existing Login</button>
+  <button id="regTab" onclick="showRegister()">🆕 New Register</button>
 </div>
 
-<!-- DASHBOARD -->
-<div id="dashboard" class="hidden">
-<h2>Welcome, <span id="userEmail"></span></h2>
-<button onclick="logout()">Logout</button>
-
-<hr>
-
-<h3>📌 New Booking</h3>
-<input id="b_name" placeholder="Name">
-<input id="b_phone" placeholder="Phone">
-<input id="b_address" placeholder="Address">
-
-<select id="b_service">
-<option>PC Repair</option>
-<option>Laptop Repair</option>
-<option>Windows Install</option>
-<option>Printer Repair</option>
-</select>
-
-<textarea id="b_problem" placeholder="Problem details"></textarea>
-<input type="date" id="b_date">
-<input type="time" id="b_time">
-
-<button onclick="submitBooking()">Submit Booking</button>
-
-<hr>
-
-<h3>🔔 Your Booking Status</h3>
-<table border="1" width="100%" cellpadding="6">
-<thead>
-<tr>
-<th>Service</th>
-<th>Date</th>
-<th>Status</th>
-</tr>
-</thead>
-<tbody id="bookingList"></tbody>
-</table>
+<!-- LOGIN -->
+<div id="loginBox">
+  <h3>Login</h3>
+  <input id="loginEmail" placeholder="Email">
+  <input id="loginPass" type="password" placeholder="Password">
+  <button class="btn" onclick="login()">Login</button>
 </div>
 
+<!-- REGISTER -->
+<div id="registerBox" class="hide">
+  <h3>New User Register</h3>
+  <input id="regName" placeholder="Full Name">
+  <input id="regPhone" placeholder="Phone Number">
+  <input id="regEmail" placeholder="Email">
+  <input id="regPass" type="password" placeholder="Password">
+  <button class="btn" onclick="register()">Register</button>
+</div>
+
+<div id="msg" class="msg"></div>
 </div>
 
 <!-- FIREBASE -->
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-app.js";
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-auth.js";
-import { getFirestore, collection, addDoc, query, where, getDocs } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore.js";
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-auth.js";
 
 const firebaseConfig = {
- apiKey: "AIzaSyDL2OFxYzmxKUp5edh6QtD2f5gkb6oZAv4",
- authDomain: "smartfix-computer-service.firebaseapp.com",
- projectId: "smartfix-computer-service",
- storageBucket: "smartfix-computer-service.firebasestorage.app",
- messagingSenderId: "393720657887",
- appId: "1:393720657887:web:4501c751f97fd75122766a"
+  apiKey: "AIzaSyDL2OFxYzmxKUp5edh6QtD2f5gkb6oZAv4",
+  authDomain: "smartfix-computer-service.firebaseapp.com",
+  projectId: "smartfix-computer-service",
+  storageBucket: "smartfix-computer-service.appspot.com",
+  messagingSenderId: "393720657887",
+  appId: "1:393720657887:web:4501c751f97fd75122766a"
 };
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
-const db = getFirestore(app);
 
-window.register = async ()=>{
- try{
-  await createUserWithEmailAndPassword(auth,email.value,password.value);
-  msg.innerText="✅ Registration successful. Now login.";
-  msg.style.color="green";
- }catch(e){
-  msg.innerText=e.message;
-  msg.style.color="red";
- }
+window.showLogin = ()=>{
+  loginBox.classList.remove("hide");
+  registerBox.classList.add("hide");
+  loginTab.classList.add("active");
+  regTab.classList.remove("active");
+  msg.innerText="";
 }
 
-window.login = async ()=>{
- try{
-  const res = await signInWithEmailAndPassword(auth,email.value,password.value);
-  authBox.classList.add("hidden");
-  dashboard.classList.remove("hidden");
-  userEmail.innerText=res.user.email;
-  loadBookings(res.user.email);
- }catch(e){
-  msg.innerText=e.message;
-  msg.style.color="red";
- }
+window.showRegister = ()=>{
+  loginBox.classList.add("hide");
+  registerBox.classList.remove("hide");
+  regTab.classList.add("active");
+  loginTab.classList.remove("active");
+  msg.innerText="";
 }
 
-window.logout = async ()=>{
- await signOut(auth);
- location.reload();
+window.register = ()=>{
+  createUserWithEmailAndPassword(auth, regEmail.value, regPass.value)
+  .then(()=>{
+    msg.style.color="green";
+    msg.innerText="✅ Registration successful! Now login.";
+    showLogin();
+  })
+  .catch(e=>{
+    msg.style.color="red";
+    msg.innerText=e.message;
+  });
 }
 
-window.submitBooking = async ()=>{
- await addDoc(collection(db,"bookings"),{
-  name:b_name.value,
-  phone:b_phone.value,
-  address:b_address.value,
-  service:b_service.value,
-  problem:b_problem.value,
-  date:b_date.value,
-  time:b_time.value,
-  userEmail:auth.currentUser.email,
-  status:"Pending"
- });
- alert("Booking submitted");
- loadBookings(auth.currentUser.email);
-}
-
-async function loadBookings(email){
- bookingList.innerHTML="";
- const q=query(collection(db,"bookings"),where("userEmail","==",email));
- const snap=await getDocs(q);
- snap.forEach(d=>{
-  const b=d.data();
-  bookingList.innerHTML+=`
-  <tr>
-   <td>${b.service}</td>
-   <td>${b.date}</td>
-   <td><span class="status ${b.status}">${b.status}</span></td>
-  </tr>`;
- });
+window.login = ()=>{
+  signInWithEmailAndPassword(auth, loginEmail.value, loginPass.value)
+  .then(()=>{
+    window.location.href="booking.html"; // next page
+  })
+  .catch(e=>{
+    msg.style.color="red";
+    msg.innerText=e.message;
+  });
 }
 </script>
 
