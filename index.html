@@ -1,240 +1,216 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>SmartFix Computer Service</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta charset="UTF-8">
+<title>SmartFix Computer Service</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <style>
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
-      color: #333;
-    }
-
-    header {
-      background: linear-gradient(90deg, #0a58ca, #00b4d8);
-      color: white;
-      padding: 20px;
-      text-align: center;
-    }
-
-    header h1 {
-      margin: 0;
-    }
-
-    .tabs {
-      display: flex;
-      justify-content: center;
-      gap: 10px;
-      margin: 20px;
-    }
-
-    .tabs button {
-      padding: 10px 20px;
-      border: none;
-      border-radius: 20px;
-      cursor: pointer;
-      font-weight: bold;
-    }
-
-    .tabs button.active {
-      background: #0a58ca;
-      color: white;
-    }
-
-    .container {
-      max-width: 600px;
-      margin: auto;
-      background: white;
-      padding: 20px;
-      border-radius: 12px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-    }
-
-    h2 {
-      margin-top: 0;
-    }
-
-    input, textarea, select {
-      width: 100%;
-      padding: 10px;
-      margin-bottom: 12px;
-      border-radius: 6px;
-      border: 1px solid #ccc;
-    }
-
-    button.submit {
-      width: 100%;
-      padding: 12px;
-      border: none;
-      border-radius: 25px;
-      background: linear-gradient(90deg, #0a58ca, #00b4d8);
-      color: white;
-      font-size: 16px;
-      cursor: pointer;
-    }
-
-    .hidden {
-      display: none;
-    }
-
-    .msg {
-      margin-top: 10px;
-      font-weight: bold;
-    }
-
-    footer {
-      text-align: center;
-      color: white;
-      margin: 20px 0;
-      font-size: 14px;
-    }
-  </style>
+<style>
+body{
+  margin:0;
+  font-family:Arial, sans-serif;
+  background:linear-gradient(120deg,#0f2027,#203a43,#2c5364);
+}
+header{
+  background:linear-gradient(to right,#0d6efd,#00b4d8);
+  color:#fff;
+  padding:20px;
+  text-align:center;
+}
+.container{
+  max-width:900px;
+  margin:30px auto;
+  background:#fff;
+  border-radius:12px;
+  padding:20px;
+}
+.tabs button{
+  padding:8px 16px;
+  margin-right:5px;
+  border:none;
+  border-radius:20px;
+  cursor:pointer;
+}
+.active{background:#0d6efd;color:#fff;}
+input,textarea,select{
+  width:100%;
+  padding:10px;
+  margin:6px 0;
+}
+button.submit{
+  background:#0d6efd;
+  color:#fff;
+  border:none;
+  padding:10px;
+  border-radius:20px;
+  cursor:pointer;
+}
+.card{
+  border:1px solid #ddd;
+  padding:12px;
+  margin-top:10px;
+  border-radius:8px;
+}
+.status{
+  padding:4px 10px;
+  border-radius:12px;
+  color:#fff;
+}
+.Pending{background:#ffc107;color:#000;}
+.Completed{background:#28a745;}
+.Cancelled{background:#dc3545;}
+.Received{background:#0dcaf0;}
+.hide{display:none;}
+</style>
 </head>
+
 <body>
 
 <header>
-  <h1>💻 SmartFix Computer Service</h1>
-  <p>Fast • Trusted • Affordable Repair & Support</p>
+<h1>💻 SmartFix Computer Service</h1>
+<p>Fast • Trusted • Affordable Repair</p>
 </header>
-
-<div class="tabs">
-  <button id="tabRegister" class="active">Register</button>
-  <button id="tabLogin">Login</button>
-  <button id="tabBooking">Booking</button>
-</div>
 
 <div class="container">
 
-  <!-- Register -->
-  <div id="register">
-    <h2>Create Account</h2>
-    <input id="regName" placeholder="Full Name" />
-    <input id="regPhone" placeholder="Phone Number" />
-    <input id="regEmail" placeholder="Email Address" />
-    <input id="regPassword" type="password" placeholder="Password" />
-    <button class="submit" onclick="register()">Register</button>
-    <div class="msg" id="regMsg"></div>
-  </div>
+<div class="tabs">
+<button id="tabReg" class="active">Register</button>
+<button id="tabLog">Login</button>
+<button id="tabBook">Booking</button>
+</div>
 
-  <!-- Login -->
-  <div id="login" class="hidden">
-    <h2>Login</h2>
-    <input id="loginEmail" placeholder="Email Address" />
-    <input id="loginPassword" type="password" placeholder="Password" />
-    <button class="submit" onclick="login()">Login</button>
-    <div class="msg" id="loginMsg"></div>
-  </div>
+<!-- REGISTER -->
+<div id="register">
+<input id="rName" placeholder="Full Name">
+<input id="rEmail" placeholder="Email">
+<input id="rPass" type="password" placeholder="Password">
+<button class="submit" onclick="register()">Register</button>
+<p id="rMsg"></p>
+</div>
 
-  <!-- Booking -->
-  <div id="booking" class="hidden">
-    <h2>Book a Service</h2>
-    <input id="bName" placeholder="Your Name" />
-    <input id="bPhone" placeholder="Phone Number" />
-    <input id="bAddress" placeholder="Address" />
-    <select id="bService">
-      <option value="">Select Service</option>
-      <option>PC Repair</option>
-      <option>Laptop Repair</option>
-      <option>Windows Install</option>
-      <option>Printer Repair</option>
-    </select>
-    <textarea id="bProblem" placeholder="Problem Details"></textarea>
-    <input id="bDate" type="date" />
-    <input id="bTime" type="time" />
-    <button class="submit" onclick="book()">Submit Booking</button>
-    <div class="msg" id="bookMsg"></div>
-  </div>
+<!-- LOGIN -->
+<div id="login" class="hide">
+<input id="lEmail" placeholder="Email">
+<input id="lPass" type="password" placeholder="Password">
+<button class="submit" onclick="login()">Login</button>
+<p id="lMsg"></p>
+</div>
+
+<!-- BOOKING -->
+<div id="booking" class="hide">
+<input id="bName" placeholder="Name">
+<input id="bPhone" placeholder="Phone">
+<input id="bAddress" placeholder="Address">
+<select id="bService">
+<option>PC Repair</option>
+<option>Laptop Repair</option>
+<option>Windows Install</option>
+<option>Printer</option>
+</select>
+<textarea id="bProblem" placeholder="Problem details"></textarea>
+<input type="date" id="bDate">
+<input type="time" id="bTime">
+<button class="submit" onclick="book()">Submit Booking</button>
+<p id="bMsg"></p>
+
+<hr>
+<h3>🔔 Your Booking Status</h3>
+<div id="dashboard">Login to see updates</div>
+</div>
 
 </div>
 
-<footer>
-  © 2026 SmartFix Computer Service • Powered by GitHub Pages + Firebase
-</footer>
-
 <script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-app.js";
-  import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } 
-    from "https://www.gstatic.com/firebasejs/12.8.0/firebase-auth.js";
-  import { getFirestore, collection, addDoc, serverTimestamp } 
-    from "https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-app.js";
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged } 
+from "https://www.gstatic.com/firebasejs/12.8.0/firebase-auth.js";
+import { getFirestore, collection, addDoc, query, where, getDocs } 
+from "https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore.js";
 
-  const firebaseConfig = {
-    apiKey: "AIzaSyDL2OFxYzmxKUp5edh6QtD2f5gkb6oZAv4",
-    authDomain: "smartfix-computer-service.firebaseapp.com",
-    projectId: "smartfix-computer-service",
-    storageBucket: "smartfix-computer-service.appspot.com",
-    messagingSenderId: "393720657887",
-    appId: "1:393720657887:web:4501c751f97fd75122766a"
-  };
+const firebaseConfig = {
+  apiKey: "AIzaSyDL2OFxYzmxKUp5edh6QtD2f5gkb6oZAv4",
+  authDomain: "smartfix-computer-service.firebaseapp.com",
+  projectId: "smartfix-computer-service",
+  storageBucket: "smartfix-computer-service.appspot.com",
+  messagingSenderId: "393720657887",
+  appId: "1:393720657887:web:4501c751f97fd75122766a"
+};
 
-  const app = initializeApp(firebaseConfig);
-  const auth = getAuth(app);
-  const db = getFirestore(app);
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
 
-  // Tabs
-  const show = (id) => {
-    ["register","login","booking"].forEach(x =>
-      document.getElementById(x).classList.add("hidden")
-    );
-    document.getElementById(id).classList.remove("hidden");
+const reg=document.getElementById("register");
+const log=document.getElementById("login");
+const bookDiv=document.getElementById("booking");
 
-    document.querySelectorAll(".tabs button").forEach(b => b.classList.remove("active"));
-    document.getElementById("tab" + id.charAt(0).toUpperCase() + id.slice(1)).classList.add("active");
-  };
+tabReg.onclick=()=>show("register");
+tabLog.onclick=()=>show("login");
+tabBook.onclick=()=>show("booking");
 
-  document.getElementById("tabRegister").onclick = () => show("register");
-  document.getElementById("tabLogin").onclick = () => show("login");
-  document.getElementById("tabBooking").onclick = () => show("booking");
+function show(id){
+  reg.classList.add("hide");
+  log.classList.add("hide");
+  bookDiv.classList.add("hide");
+  document.getElementById(id).classList.remove("hide");
+}
 
-  // Register
-  window.register = async () => {
-    try {
-      await createUserWithEmailAndPassword(
-        auth,
-        regEmail.value,
-        regPassword.value
-      );
-      regMsg.textContent = "✅ Registration successful!";
-    } catch (e) {
-      regMsg.textContent = "❌ " + e.message;
-    }
-  };
+window.register=async()=>{
+  try{
+    await createUserWithEmailAndPassword(auth,rEmail.value,rPass.value);
+    rMsg.innerText="Registered!";
+    show("login");
+  }catch(e){rMsg.innerText=e.message;}
+}
 
-  // Login
-  window.login = async () => {
-    try {
-      await signInWithEmailAndPassword(
-        auth,
-        loginEmail.value,
-        loginPassword.value
-      );
-      loginMsg.textContent = "✅ Login successful!";
-    } catch (e) {
-      loginMsg.textContent = "❌ " + e.message;
-    }
-  };
+window.login=async()=>{
+  try{
+    await signInWithEmailAndPassword(auth,lEmail.value,lPass.value);
+    lMsg.innerText="Logged in!";
+    show("booking");
+  }catch(e){lMsg.innerText=e.message;}
+}
 
-  // Booking
-  window.book = async () => {
-    try {
-      await addDoc(collection(db, "bookings"), {
-        name: bName.value,
-        phone: bPhone.value,
-        address: bAddress.value,
-        service: bService.value,
-        problem: bProblem.value,
-        date: bDate.value,
-        time: bTime.value,
-        createdAt: serverTimestamp()
-      });
-      bookMsg.textContent = "✅ Booking submitted!";
-    } catch (e) {
-      bookMsg.textContent = "❌ " + e.message;
-    }
-  };
+window.book=async()=>{
+  await addDoc(collection(db,"bookings"),{
+    userEmail:auth.currentUser.email,
+    name:bName.value,
+    phone:bPhone.value,
+    address:bAddress.value,
+    service:bService.value,
+    problem:bProblem.value,
+    date:bDate.value,
+    time:bTime.value,
+    status:"Pending"
+  });
+  bMsg.innerText="Booking submitted!";
+  loadDashboard();
+}
+
+async function loadDashboard(){
+  const dash=document.getElementById("dashboard");
+  dash.innerHTML="Loading...";
+  const q=query(collection(db,"bookings"),where("userEmail","==",auth.currentUser.email));
+  const snap=await getDocs(q);
+  dash.innerHTML="";
+  snap.forEach(d=>{
+    const b=d.data();
+    dash.innerHTML+=`
+    <div class="card">
+    <b>${b.service}</b><br>
+    ${b.date} ${b.time}<br>
+    <span class="status ${b.status}">${b.status}</span>
+    ${b.status==="Cancelled"?`<p>Reason: ${b.cancelReason}</p>`:""}
+    </div>`;
+  });
+}
+
+onAuthStateChanged(auth,user=>{
+  if(user){
+    show("booking");
+    loadDashboard();
+  }
+});
 </script>
 
 </body>
