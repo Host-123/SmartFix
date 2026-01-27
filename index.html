@@ -7,49 +7,42 @@
 
 <style>
 body{
-  margin:0;
-  font-family:Arial, sans-serif;
+  font-family:Arial;
   background:linear-gradient(120deg,#0f2027,#203a43,#2c5364);
+  margin:0;
 }
 header{
-  background:linear-gradient(to right,#0d6efd,#00b4d8);
+  background:#0d6efd;
   color:#fff;
-  padding:20px;
+  padding:15px;
   text-align:center;
 }
 .container{
   max-width:900px;
-  margin:30px auto;
+  margin:20px auto;
   background:#fff;
-  border-radius:12px;
   padding:20px;
+  border-radius:12px;
 }
-.tabs button{
-  padding:8px 16px;
-  margin-right:5px;
-  border:none;
-  border-radius:20px;
-  cursor:pointer;
-}
-.active{background:#0d6efd;color:#fff;}
-input,textarea,select{
+.hidden{display:none;}
+input,select,textarea{
   width:100%;
   padding:10px;
   margin:6px 0;
 }
-button.submit{
+button{
+  padding:8px 14px;
+  border:none;
+  border-radius:20px;
   background:#0d6efd;
   color:#fff;
-  border:none;
-  padding:10px;
-  border-radius:20px;
   cursor:pointer;
 }
 .card{
   border:1px solid #ddd;
+  border-radius:8px;
   padding:12px;
   margin-top:10px;
-  border-radius:8px;
 }
 .status{
   padding:4px 10px;
@@ -60,69 +53,60 @@ button.submit{
 .Completed{background:#28a745;}
 .Cancelled{background:#dc3545;}
 .Received{background:#0dcaf0;}
-.hide{display:none;}
+nav button{margin-right:6px;}
 </style>
 </head>
 
 <body>
 
 <header>
-<h1>💻 SmartFix Computer Service</h1>
-<p>Fast • Trusted • Affordable Repair</p>
+<h2>👤 SmartFix Customer Portal</h2>
+<p>Manage your service bookings easily</p>
 </header>
 
 <div class="container">
 
-<div class="tabs">
-<button id="tabReg" class="active">Register</button>
-<button id="tabLog">Login</button>
-<button id="tabBook">Booking</button>
+<!-- LOGIN / REGISTER -->
+<div id="authBox">
+  <h3>Login / Register</h3>
+  <input id="email" placeholder="Email">
+  <input id="password" type="password" placeholder="Password">
+  <button onclick="login()">Login</button>
+  <button onclick="register()">Register</button>
+  <p id="authMsg"></p>
 </div>
 
-<!-- REGISTER -->
-<div id="register">
-<input id="rName" placeholder="Full Name">
-<input id="rEmail" placeholder="Email">
-<input id="rPass" type="password" placeholder="Password">
-<button class="submit" onclick="register()">Register</button>
-<p id="rMsg"></p>
-</div>
+<!-- DASHBOARD -->
+<div id="dashboard" class="hidden">
+  <nav>
+    <button onclick="showSection('newBooking')">➕ New Booking</button>
+    <button onclick="showSection('myBookings')">📋 My Bookings</button>
+    <button onclick="logout()">Logout</button>
+  </nav>
 
-<!-- LOGIN -->
-<div id="login" class="hide">
-<input id="lEmail" placeholder="Email">
-<input id="lPass" type="password" placeholder="Password">
-<button class="submit" onclick="login()">Login</button>
-<p id="lMsg"></p>
-</div>
+  <!-- NEW BOOKING -->
+  <div id="newBooking" class="section">
+    <h3>New Booking</h3>
+    <input id="bService" placeholder="Service (Laptop / PC / Windows)">
+    <textarea id="bProblem" placeholder="Problem details"></textarea>
+    <input type="date" id="bDate">
+    <input type="time" id="bTime">
+    <button onclick="book()">Submit Booking</button>
+    <p id="bookMsg"></p>
+  </div>
 
-<!-- BOOKING -->
-<div id="booking" class="hide">
-<input id="bName" placeholder="Name">
-<input id="bPhone" placeholder="Phone">
-<input id="bAddress" placeholder="Address">
-<select id="bService">
-<option>PC Repair</option>
-<option>Laptop Repair</option>
-<option>Windows Install</option>
-<option>Printer</option>
-</select>
-<textarea id="bProblem" placeholder="Problem details"></textarea>
-<input type="date" id="bDate">
-<input type="time" id="bTime">
-<button class="submit" onclick="book()">Submit Booking</button>
-<p id="bMsg"></p>
-
-<hr>
-<h3>🔔 Your Booking Status</h3>
-<div id="dashboard">Login to see updates</div>
+  <!-- MY BOOKINGS -->
+  <div id="myBookings" class="section hidden">
+    <h3>My Bookings</h3>
+    <div id="bookingList">Loading...</div>
+  </div>
 </div>
 
 </div>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-app.js";
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged } 
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } 
 from "https://www.gstatic.com/firebasejs/12.8.0/firebase-auth.js";
 import { getFirestore, collection, addDoc, query, where, getDocs } 
 from "https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore.js";
@@ -140,77 +124,75 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-const reg=document.getElementById("register");
-const log=document.getElementById("login");
-const bookDiv=document.getElementById("booking");
+const authBox = document.getElementById("authBox");
+const dash = document.getElementById("dashboard");
 
-tabReg.onclick=()=>show("register");
-tabLog.onclick=()=>show("login");
-tabBook.onclick=()=>show("booking");
-
-function show(id){
-  reg.classList.add("hide");
-  log.classList.add("hide");
-  bookDiv.classList.add("hide");
-  document.getElementById(id).classList.remove("hide");
-}
-
-window.register=async()=>{
+window.register = async ()=>{
   try{
-    await createUserWithEmailAndPassword(auth,rEmail.value,rPass.value);
-    rMsg.innerText="Registered!";
-    show("login");
-  }catch(e){rMsg.innerText=e.message;}
-}
+    await createUserWithEmailAndPassword(auth,email.value,password.value);
+    authMsg.innerText="Registered successfully!";
+  }catch(e){authMsg.innerText=e.message;}
+};
 
-window.login=async()=>{
+window.login = async ()=>{
   try{
-    await signInWithEmailAndPassword(auth,lEmail.value,lPass.value);
-    lMsg.innerText="Logged in!";
-    show("booking");
-  }catch(e){lMsg.innerText=e.message;}
-}
+    await signInWithEmailAndPassword(auth,email.value,password.value);
+  }catch(e){authMsg.innerText=e.message;}
+};
 
-window.book=async()=>{
+window.logout = async ()=>{
+  await signOut(auth);
+};
+
+onAuthStateChanged(auth,user=>{
+  if(user){
+    authBox.classList.add("hidden");
+    dash.classList.remove("hidden");
+    loadBookings();
+  }else{
+    authBox.classList.remove("hidden");
+    dash.classList.add("hidden");
+  }
+});
+
+window.book = async ()=>{
   await addDoc(collection(db,"bookings"),{
     userEmail:auth.currentUser.email,
-    name:bName.value,
-    phone:bPhone.value,
-    address:bAddress.value,
     service:bService.value,
     problem:bProblem.value,
     date:bDate.value,
     time:bTime.value,
     status:"Pending"
   });
-  bMsg.innerText="Booking submitted!";
-  loadDashboard();
-}
+  bookMsg.innerText="Booking submitted!";
+  loadBookings();
+};
 
-async function loadDashboard(){
-  const dash=document.getElementById("dashboard");
-  dash.innerHTML="Loading...";
+async function loadBookings(){
+  const list=document.getElementById("bookingList");
+  list.innerHTML="";
   const q=query(collection(db,"bookings"),where("userEmail","==",auth.currentUser.email));
   const snap=await getDocs(q);
-  dash.innerHTML="";
+
+  if(snap.empty){list.innerText="No bookings yet";return;}
+
   snap.forEach(d=>{
     const b=d.data();
-    dash.innerHTML+=`
+    list.innerHTML+=`
     <div class="card">
-    <b>${b.service}</b><br>
-    ${b.date} ${b.time}<br>
-    <span class="status ${b.status}">${b.status}</span>
-    ${b.status==="Cancelled"?`<p>Reason: ${b.cancelReason}</p>`:""}
+      <b>${b.service}</b><br>
+      ${b.date} ${b.time}<br>
+      <span class="status ${b.status}">${b.status}</span>
+      ${b.status==="Cancelled"?`<p>Reason: ${b.cancelReason}</p>`:""}
+      ${b.status==="Completed"?`<textarea placeholder="Feedback"></textarea><button>Submit Feedback</button>`:""}
     </div>`;
   });
 }
 
-onAuthStateChanged(auth,user=>{
-  if(user){
-    show("booking");
-    loadDashboard();
-  }
-});
+window.showSection=(id)=>{
+  document.querySelectorAll(".section").forEach(s=>s.classList.add("hidden"));
+  document.getElementById(id).classList.remove("hidden");
+};
 </script>
 
 </body>
