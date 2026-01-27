@@ -18,7 +18,7 @@ body{
   padding:25px;
   border-radius:10px;
 }
-h2{margin-top:0}
+h2,h3{margin-top:0}
 input,select,textarea,button{
   width:100%;
   padding:10px;
@@ -45,7 +45,6 @@ button:hover{opacity:.9}
 <h2>🔧 New Booking</h2>
 
 <form id="bookingForm">
-
 <input id="name" placeholder="Full Name" required>
 <input id="phone" placeholder="Phone Number" required>
 <input id="address" placeholder="Address" required>
@@ -60,7 +59,6 @@ button:hover{opacity:.9}
 </select>
 
 <textarea id="problem" placeholder="Problem details"></textarea>
-
 <input type="date" id="date" required>
 <input type="time" id="time" required>
 
@@ -68,49 +66,102 @@ button:hover{opacity:.9}
 </form>
 
 <div id="msg"></div>
+
+<hr>
+<h3>📌 Your Booking Status</h3>
+<div id="statusBox">Enter phone number to see status</div>
 </div>
 
 <!-- ================= FIREBASE ================= -->
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-app.js";
-import { getFirestore, collection, addDoc, serverTimestamp }
-from "https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore.js";
+import { 
+  getFirestore, 
+  collection, 
+  addDoc, 
+  serverTimestamp,
+  onSnapshot,
+  query,
+  where
+} from "https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore.js";
 
+/* Firebase config */
 const firebaseConfig = {
   apiKey: "AIzaSyDL2OFxYzmxKUp5edh6QtD2f5gkb6oZAv4",
   authDomain: "smartfix-computer-service.firebaseapp.com",
-  projectId: "smartfix-computer-service",
+  projectId: "smartfix-computer-service"
 };
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
+const phoneInput = document.getElementById("phone");
+const statusBox = document.getElementById("statusBox");
+
+/* SUBMIT BOOKING */
 document.getElementById("bookingForm").addEventListener("submit", async (e)=>{
   e.preventDefault();
 
   const data = {
-    name: document.getElementById("name").value || "",
-    phone: document.getElementById("phone").value || "",
-    address: document.getElementById("address").value || "",
-    service: document.getElementById("service").value || "",
-    problem: document.getElementById("problem").value || "",
-    date: document.getElementById("date").value || "",
-    time: document.getElementById("time").value || "",
+    name: name.value,
+    phone: phone.value,
+    address: address.value,
+    service: service.value,
+    problem: problem.value,
+    date: date.value,
+    time: time.value,
     status: "Pending",
     createdAt: serverTimestamp()
   };
 
   try{
     await addDoc(collection(db,"bookings"), data);
-    document.getElementById("msg").innerHTML = "✅ Booking successful!";
+    msg.innerHTML = "✅ Booking successful!";
+    loadStatus(phone.value);
     e.target.reset();
   }catch(err){
-    document.getElementById("msg").innerHTML = "❌ " + err.message;
-    console.error(err);
+    msg.innerHTML = "❌ " + err.message;
   }
 });
-</script>
 
+/* LIVE STATUS */
+function loadStatus(phone){
+  if(!phone) return;
+
+  const q = query(collection(db,"bookings"), where("phone","==",phone));
+
+  onSnapshot(q, snap=>{
+    if(snap.empty){
+      statusBox.innerHTML = "❌ No booking found";
+      return;
+    }
+
+    let html = "";
+    snap.forEach(doc=>{
+      const b = doc.data();
+      html += `
+      <div style="border:1px solid #ccc;padding:10px;margin-bottom:8px;border-radius:6px">
+        <b>Service:</b> ${b.service}<br>
+        <b>Date:</b> ${b.date} ${b.time}<br>
+        <b>Status:</b>
+        <span style="
+          padding:4px 10px;
+          border-radius:20px;
+          color:white;
+          background:${b.status==="Completed"?"green":b.status==="Cancelled"?"red":"orange"};
+        ">
+          ${b.status}
+        </span>
+      </div>`;
+    });
+    statusBox.innerHTML = html;
+  });
+}
+
+phoneInput.addEventListener("change",()=>{
+  loadStatus(phoneInput.value.trim());
+});
+</script>
 
 </body>
 </html>
