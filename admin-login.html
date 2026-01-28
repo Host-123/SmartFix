@@ -47,8 +47,7 @@ button{
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-app.js";
-import { getAuth, signInWithEmailAndPassword }
-from "https://www.gstatic.com/firebasejs/12.8.0/firebase-auth.js";
+import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-auth.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyDL2OFxYzmxKUp5edh6QtD2f5gkb6oZAv4",
@@ -59,31 +58,33 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 
-/* ✅ ADMIN EMAIL LIST */
+/* ✅ ADMIN EMAIL LIST (exact same email as Firebase Auth) */
 const ADMINS = [
-  "admin@smartfix.com",
-  "student.student.on@gmail.com"   // 👈 এটা add করো
+  "student.student.on@gmail.com"
 ];
 
-
-window.login = async ()=>{
-  const email = document.getElementById("email").value;
+window.login = async () => {
+  const email = document.getElementById("email").value.trim();
   const pass  = document.getElementById("password").value;
 
-  try{
-    const res = await signInWithEmailAndPassword(auth,email,pass);
+  try {
+    const res = await signInWithEmailAndPassword(auth, email, pass);
 
-    if(!ADMINS.includes(res.user.email)){
-      document.getElementById("msg").innerText="❌ Access denied";
+    // ✅ ONLY allow admins
+    if (!ADMINS.includes(res.user.email)) {
+      document.getElementById("msg").innerText = "❌ Access denied";
       return;
     }
 
-    location.href="admin.html";
-  }catch(err){
-    document.getElementById("msg").innerText=err.message;
+    // ✅ success → go to admin dashboard
+    location.href = "admin.html";
+
+  } catch (err) {
+    document.getElementById("msg").innerText = err.message;
   }
 };
 </script>
+
 
 </body>
 </html>
