@@ -10,7 +10,6 @@ body{
   font-family: Arial, sans-serif;
   background: linear-gradient(120deg,#0f2027,#203a43,#2c5364);
   margin:0;
-  padding:0;
 }
 header{
   background: linear-gradient(to right,#0d6efd,#00b4d8);
@@ -33,6 +32,7 @@ button{
 }
 .edit{background:#0d6efd;color:#fff;}
 .done{background:#28a745;color:#fff;}
+.logout{background:#dc3545;color:#fff;float:right}
 table{
   width:100%;
   border-collapse:collapse;
@@ -57,10 +57,11 @@ th,td{
 <header>
   <h1>📌 SmartFix Admin Dashboard</h1>
   <p>All customer bookings appear here</p>
+  <button class="logout" onclick="logout()">Logout</button>
 </header>
 
 <div class="container">
-  <button onclick="loadBookings()">🔄 Refresh Bookings</button>
+  <button onclick="loadBookings()">🔄 Refresh</button>
   <p id="info"></p>
 
   <table id="table" style="display:none;">
@@ -84,63 +85,82 @@ th,td{
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-app.js";
-import { getFirestore, collection, getDocs, updateDoc, doc } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore.js";
+import { 
+  getAuth, onAuthStateChanged, signOut 
+} from "https://www.gstatic.com/firebasejs/12.8.0/firebase-auth.js";
+import { 
+  getFirestore, collection, getDocs, updateDoc, doc 
+} from "https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyDL2OFxYzmxKUp5edh6QtD2f5gkb6oZAv4",
   authDomain: "smartfix-computer-service.firebaseapp.com",
   projectId: "smartfix-computer-service",
-  storageBucket: "smartfix-computer-service.firebasestorage.app",
-  messagingSenderId: "393720657887",
-  appId: "1:393720657887:web:4501c751f97fd75122766a"
 };
 
 const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
 const db = getFirestore(app);
 
-async function loadBookings(){
+/* ✅ ADMIN LIST */
+const ADMINS = ["admin@smartfix.com"];
+
+/* 🔐 SECURITY CHECK */
+onAuthStateChanged(auth,(user)=>{
+  if(!user || !ADMINS.includes(user.email)){
+    location.href="admin-login.html";
+  }
+});
+
+/* LOGOUT */
+window.logout = ()=>{
+  signOut(auth).then(()=>{
+    location.href="admin-login.html";
+  });
+};
+
+/* LOAD BOOKINGS */
+window.loadBookings = async ()=>{
   const tbody = document.getElementById("tbody");
   const info = document.getElementById("info");
   tbody.innerHTML = "";
-  
+
   const snap = await getDocs(collection(db,"bookings"));
   if(snap.empty){
-    info.textContent = "❌ No bookings found!";
+    info.textContent="❌ No bookings found";
     return;
   }
 
-  let i = 1;
+  let i=1;
   snap.forEach(d=>{
-    const b = d.data();
-    const tr = document.createElement("tr");
-
-    tr.innerHTML = `
-      <td>${i++}</td>
-      <td contenteditable>${b.name}</td>
-      <td contenteditable>${b.phone}</td>
-      <td contenteditable>${b.address}</td>
-      <td contenteditable>${b.service}</td>
-      <td contenteditable>${b.problem}</td>
-      <td contenteditable>${b.date}</td>
-      <td contenteditable>${b.time}</td>
-      <td>
-        <span class="status ${b.status==="Completed"?"completed":"pending"}">
-          ${b.status || "Pending"}
-        </span>
-      </td>
-      <td>
-        <button class="edit" onclick="saveEdit('${d.id}',this)">Save</button>
-        <button class="done" onclick="markDone('${d.id}')">Completed</button>
-      </td>
-    `;
-    tbody.appendChild(tr);
+    const b=d.data();
+    tbody.innerHTML+=`
+      <tr>
+        <td>${i++}</td>
+        <td contenteditable>${b.name}</td>
+        <td contenteditable>${b.phone}</td>
+        <td contenteditable>${b.address}</td>
+        <td contenteditable>${b.service}</td>
+        <td contenteditable>${b.problem}</td>
+        <td contenteditable>${b.date}</td>
+        <td contenteditable>${b.time}</td>
+        <td>
+          <span class="status ${b.status==="Completed"?"completed":"pending"}">
+            ${b.status}
+          </span>
+        </td>
+        <td>
+          <button class="edit" onclick="saveEdit('${d.id}',this)">Save</button>
+          <button class="done" onclick="markDone('${d.id}')">Completed</button>
+        </td>
+      </tr>`;
   });
 
-  info.textContent = `✅ Total bookings: ${snap.size}`;
+  info.textContent=`✅ Total bookings: ${snap.size}`;
   document.getElementById("table").style.display="table";
-}
+};
 
-window.saveEdit = async function(id,btn){
+window.saveEdit = async (id,btn)=>{
   const td = btn.parentElement.parentElement.children;
   await updateDoc(doc(db,"bookings",id),{
     name: td[1].innerText,
@@ -151,15 +171,13 @@ window.saveEdit = async function(id,btn){
     date: td[6].innerText,
     time: td[7].innerText
   });
-  alert("✏️ Booking updated");
-}
+  alert("✏️ Updated");
+};
 
-window.markDone = async function(id){
-  await updateDoc(doc(db,"bookings",id),{
-    status:"Completed"
-  });
+window.markDone = async (id)=>{
+  await updateDoc(doc(db,"bookings",id),{status:"Completed"});
   loadBookings();
-}
+};
 
 loadBookings();
 </script>
