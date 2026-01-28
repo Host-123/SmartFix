@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>SmartFix Admin Login</title>
+<style>
+body{
+  font-family:Arial;
+  background:linear-gradient(120deg,#0f2027,#203a43,#2c5364);
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  height:100vh;
+}
+.card{
+  background:#fff;
+  padding:30px;
+  width:320px;
+  border-radius:10px;
+}
+input,button{
+  width:100%;
+  padding:10px;
+  margin:10px 0;
+}
+button{
+  background:#0d6efd;
+  color:white;
+  border:none;
+  cursor:pointer;
+}
+#msg{color:red;text-align:center}
+</style>
+</head>
+
+<body>
+
+<div class="card">
+<h2>🔐 Admin Login</h2>
+
+<input id="email" placeholder="Admin Email">
+<input id="password" type="password" placeholder="Password">
+
+<button onclick="login()">Login</button>
+<p id="msg"></p>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-app.js";
+import { getAuth, signInWithEmailAndPassword }
+from "https://www.gstatic.com/firebasejs/12.8.0/firebase-auth.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyDL2OFxYzmxKUp5edh6QtD2f5gkb6oZAv4",
+  authDomain: "smartfix-computer-service.firebaseapp.com",
+  projectId: "smartfix-computer-service",
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+
+/* ✅ ADMIN EMAIL LIST */
+const ADMINS = [
+  "admin@smartfix.com"   // 👉 এখানে নিজের admin email দাও
+];
+
+window.login = async ()=>{
+  const email = document.getElementById("email").value;
+  const pass  = document.getElementById("password").value;
+
+  try{
+    const res = await signInWithEmailAndPassword(auth,email,pass);
+
+    if(!ADMINS.includes(res.user.email)){
+      document.getElementById("msg").innerText="❌ Access denied";
+      return;
+    }
+
+    location.href="admin.html";
+  }catch(err){
+    document.getElementById("msg").innerText=err.message;
+  }
+};
+</script>
+
+</body>
+</html>
