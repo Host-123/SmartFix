@@ -36,18 +36,13 @@ button:hover{opacity:.9}
   margin-top:10px;
   font-weight:bold;
 }
-.editBtn{
-  background:#ffc107;
-  color:black;
-  margin-top:6px;
-}
 </style>
 </head>
 
 <body>
 
 <div class="card">
-<h2>🔧 SmartFix Computer Service</h2>
+<h2>🔧 New Booking</h2>
 
 <form id="bookingForm">
 <input id="name" placeholder="Full Name" required>
@@ -73,15 +68,16 @@ button:hover{opacity:.9}
 <div id="msg"></div>
 
 <hr>
-<h3>📌 Your Booking History</h3>
+<h3>📌 Your Booking Status</h3>
 <div id="statusBox">Enter phone number to see status</div>
 </div>
 
+<!-- ================= FIREBASE ================= -->
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-app.js";
 import { 
   getFirestore, collection, addDoc, serverTimestamp,
-  query, where, onSnapshot, updateDoc, doc
+  query, where, onSnapshot 
 } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore.js";
 
 const firebaseConfig = {
@@ -102,7 +98,7 @@ document.getElementById("bookingForm").addEventListener("submit", async (e)=>{
 
   const data = {
     name: document.getElementById("name").value,
-    phone,
+    phone: phone,
     address: document.getElementById("address").value,
     service: document.getElementById("service").value,
     problem: document.getElementById("problem").value,
@@ -114,7 +110,6 @@ document.getElementById("bookingForm").addEventListener("submit", async (e)=>{
 
   try{
     await addDoc(collection(db,"bookings"), data);
-    localStorage.setItem("smartfix_phone", phone);
     document.getElementById("msg").innerHTML = "✅ Booking successful!";
     loadHistory(phone);
     e.target.reset();
@@ -123,7 +118,7 @@ document.getElementById("bookingForm").addEventListener("submit", async (e)=>{
   }
 });
 
-/* ================= LOAD HISTORY ================= */
+/* ================= CUSTOMER HISTORY ================= */
 
 const phoneInput = document.getElementById("phone");
 const statusBox = document.getElementById("statusBox");
@@ -138,50 +133,38 @@ function loadHistory(phone){
 
   onSnapshot(q,(snap)=>{
     if(snap.empty){
-      statusBox.innerHTML="❌ No bookings found";
+      statusBox.innerHTML = "❌ No bookings found";
       return;
     }
 
-    let html="";
-    snap.forEach(d=>{
-      const b=d.data();
+    let html = "";
+    snap.forEach(doc=>{
+      const b = doc.data();
       const color =
-        b.status==="Completed"?"green":
-        b.status==="Cancelled"?"red":"orange";
+        b.status==="Completed" ? "green" :
+        b.status==="Cancelled" ? "red" : "orange";
 
-      html+=`
-      <div style="border:1px solid #ccc;padding:10px;margin-bottom:10px;border-radius:8px">
-        <b>Service:</b> ${b.service}<br>
-        <b>Date:</b> ${b.date} ${b.time}<br>
-        <b>Problem:</b> ${b.problem || "-"}<br>
-        <b>Status:</b>
-        <span style="background:${color};color:white;padding:4px 12px;border-radius:20px">
-          ${b.status}
-        </span>
-        ${
-          b.status==="Pending"
-          ? `<br><button class="editBtn" onclick="editBooking('${d.id}')">✏️ Edit Problem</button>`
-          : ""
-        }
-      </div>`;
+      html += `
+        <div style="border:1px solid #ccc;padding:10px;margin-bottom:10px;border-radius:8px">
+          <b>Service:</b> ${b.service}<br>
+          <b>Date:</b> ${b.date} ${b.time}<br>
+          <b>Problem:</b> ${b.problem || "-"}<br>
+          <b>Status:</b> 
+          <span style="background:${color};color:white;padding:4px 12px;border-radius:20px">
+            ${b.status}
+          </span>
+        </div>
+      `;
     });
-    statusBox.innerHTML=html;
+
+    statusBox.innerHTML = html;
   });
 }
 
-/* ================= EDIT BOOKING ================= */
+phoneInput.addEventListener("change", ()=>{
+  loadHistory(phoneInput.value.trim());
+});
+</script>
 
-window.editBooking = async (id)=>{
-  const newProblem = prompt("Update your problem:");
-  if(!newProblem) return;
-
-  await updateDoc(doc(db,"bookings",id),{
-    problem:newProblem
-  });
-
-  alert("✅ Booking updated");
-};
-
-/* ================= AUTO LOAD AFTER REFRESH ================= */
-
-window
+</body>
+</html>
