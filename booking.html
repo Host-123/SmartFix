@@ -26,12 +26,8 @@ body{
   border:1px solid rgba(255,255,255,.3);
 }
 
-h2,h3{
-  text-align:center;
-  margin-top:0;
-}
+h2,h3{text-align:center;margin-top:0;}
 
-/* ===== INPUTS ===== */
 input,select,textarea,button{
   width:100%;
   padding:12px;
@@ -39,33 +35,15 @@ input,select,textarea,button{
   border-radius:8px;
   border:1px solid rgba(255,255,255,.45);
   background:rgba(255,255,255,.28);
-  color:#ffffff;
-  font-size:15px;
+  color:#fff;
 }
 
-input::placeholder,
-textarea::placeholder{
+input::placeholder,textarea::placeholder{
   color:#f1f5f9;
   opacity:1;
-  font-weight:500;
 }
 
-select{color:#fff;}
 select option{color:#000;}
-
-input:focus,
-textarea:focus,
-select:focus{
-  outline:none;
-  box-shadow:0 0 0 2px rgba(13,110,253,.6);
-}
-
-input[type="date"],
-input[type="time"]{
-  color-scheme: dark;
-}
-
-textarea{resize:none;}
 
 button{
   background:#0d6efd;
@@ -75,19 +53,12 @@ button{
 }
 button:hover{opacity:.9;}
 
-.logout{
-  background:#dc3545;
-  margin-bottom:10px;
-}
-
-#msg{
-  text-align:center;
-  font-weight:bold;
-  margin-top:10px;
+.refresh{
+  background:#6c757d;
 }
 
 .status-card{
-  margin-top:10px;
+  margin-top:8px;
   padding:10px;
   border-radius:10px;
   background:rgba(255,255,255,.15);
@@ -96,8 +67,21 @@ button:hover{opacity:.9;}
 .badge{
   padding:4px 12px;
   border-radius:20px;
-  color:#fff;
   font-size:13px;
+  color:#fff;
+}
+
+.summary{
+  display:flex;
+  gap:10px;
+  margin:10px 0;
+}
+.summary div{
+  flex:1;
+  text-align:center;
+  padding:8px;
+  border-radius:10px;
+  background:rgba(255,255,255,.15);
 }
 </style>
 </head>
@@ -105,10 +89,6 @@ button:hover{opacity:.9;}
 <body>
 
 <div class="card">
-
-  <!-- LOGOUT -->
-  <button class="logout" onclick="logout()">Logout</button>
-
   <h2>🔧 Book a Service</h2>
 
   <form id="bookingForm">
@@ -131,18 +111,24 @@ button:hover{opacity:.9;}
     <button type="submit">Submit Booking</button>
   </form>
 
-  <div id="msg"></div>
+  <p id="msg"></p>
 
   <h3>📌 Your Booking Status</h3>
+
+  <!-- SUMMARY -->
+  <div class="summary">
+    <div>Total: <b id="total">0</b></div>
+    <div>Pending: <b id="pending">0</b></div>
+    <div>Completed: <b id="completed">0</b></div>
+  </div>
+
+  <button class="refresh" onclick="refreshStatus()">🔄 Refresh Status</button>
+
   <div id="statusBox">Enter phone number to see status</div>
 </div>
 
-<!-- ===== FIREBASE ===== -->
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-app.js";
-import {
-  getAuth, signOut, onAuthStateChanged
-} from "https://www.gstatic.com/firebasejs/12.8.0/firebase-auth.js";
 import {
   getFirestore, collection, addDoc, serverTimestamp,
   query, where, onSnapshot
@@ -155,68 +141,52 @@ const firebaseConfig = {
 };
 
 const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
 const db = getFirestore(app);
 
-/* ===== AUTH GUARD ===== */
-onAuthStateChanged(auth,user=>{
-  if(!user){
-    location.href="index.html";
-  }
-});
-
-/* ===== ELEMENTS ===== */
-const form = document.getElementById("bookingForm");
-const msg = document.getElementById("msg");
+const phoneInput = document.getElementById("phone");
 const statusBox = document.getElementById("statusBox");
 
-const nameInput = document.getElementById("name");
-const phoneInput = document.getElementById("phone");
-const addressInput = document.getElementById("address");
-const serviceInput = document.getElementById("service");
-const problemInput = document.getElementById("problem");
-const dateInput = document.getElementById("date");
-const timeInput = document.getElementById("time");
+const totalEl = document.getElementById("total");
+const pendingEl = document.getElementById("pending");
+const completedEl = document.getElementById("completed");
 
-/* ===== SUBMIT BOOKING ===== */
-form.addEventListener("submit", async e=>{
+/* SUBMIT BOOKING */
+bookingForm.addEventListener("submit", async e=>{
   e.preventDefault();
 
-  try{
-    await addDoc(collection(db,"bookings"),{
-      name: nameInput.value,
-      phone: phoneInput.value,
-      address: addressInput.value,
-      service: serviceInput.value,
-      problem: problemInput.value,
-      date: dateInput.value,
-      time: timeInput.value,
-      status: "Pending",
-      createdAt: serverTimestamp()
-    });
+  await addDoc(collection(db,"bookings"),{
+    name: name.value,
+    phone: phone.value,
+    address: address.value,
+    service: service.value,
+    problem: problem.value,
+    date: date.value,
+    time: time.value,
+    status:"Pending",
+    createdAt: serverTimestamp()
+  });
 
-    msg.textContent="✅ Booking successful!";
-    loadHistory(phoneInput.value);
-    form.reset();
-  }catch(err){
-    msg.textContent="❌ " + err.message;
-  }
+  msg.textContent="✅ Booking successful!";
+  refreshStatus();
+  bookingForm.reset();
 });
 
-/* ===== LOAD STATUS ===== */
-function loadHistory(phone){
+/* LOAD STATUS */
+function loadStatus(phone){
   if(!phone) return;
 
   const q = query(collection(db,"bookings"), where("phone","==",phone));
-  onSnapshot(q,snap=>{
-    if(snap.empty){
-      statusBox.textContent="❌ No bookings found";
-      return;
-    }
 
+  onSnapshot(q,snap=>{
+    let total=0,pending=0,completed=0;
     statusBox.innerHTML="";
+
     snap.forEach(d=>{
+      total++;
       const b=d.data();
+      if(b.status==="Completed") completed++;
+      else pending++;
+
       const color=b.status==="Completed"?"green":"orange";
       statusBox.innerHTML+=`
         <div class="status-card">
@@ -225,17 +195,18 @@ function loadHistory(phone){
           <span class="badge" style="background:${color}">
             ${b.status}
           </span>
-        </div>
-      `;
+        </div>`;
     });
+
+    totalEl.textContent=total;
+    pendingEl.textContent=pending;
+    completedEl.textContent=completed;
   });
 }
 
-/* ===== LOGOUT ===== */
-window.logout = ()=>{
-  signOut(auth).then(()=>{
-    location.href="index.html";
-  });
+/* REFRESH BUTTON */
+window.refreshStatus = ()=>{
+  loadStatus(phoneInput.value.trim());
 };
 </script>
 
