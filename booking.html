@@ -2,130 +2,40 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>SmartFix – Booking</title>
+<title>Customer Register</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
 <style>
-*{
-  box-sizing:border-box;
-  font-family: Arial, sans-serif;
-}
-
-/* ===== BACKGROUND ===== */
 body{
   margin:0;
-  min-height:100vh;
+  height:100vh;
   display:flex;
   justify-content:center;
-  align-items:flex-start;
-  padding:40px 15px;
-  background: linear-gradient(135deg,#0f2027,#203a43,#2c5364);
-  color:#fff;
+  align-items:center;
+  background: linear-gradient(120deg,#0f2027,#203a43,#2c5364);
+  font-family: Arial, sans-serif;
 }
-
-/* ===== GLASS CARD ===== */
 .card{
-  width:100%;
-  max-width:520px;
-  padding:25px;
-
+  width:360px;
+  padding:30px;
   background: rgba(255,255,255,0.18);
   backdrop-filter: blur(15px);
-  -webkit-backdrop-filter: blur(15px);
-
   border-radius:16px;
   border:1px solid rgba(255,255,255,0.3);
-  box-shadow:0 8px 32px rgba(0,0,0,0.35);
-
-  animation: fadeUp .8s ease;
+  color:#fff;
 }
-
-/* ===== HEADINGS ===== */
-h2,h3{
-  margin-top:0;
-  text-align:center;
-}
-
-/* ===== FORM ===== */
-input,select,textarea,button{
+input,button{
   width:100%;
-  padding:10px;
-  margin:8px 0;
-  font-size:15px;
+  padding:12px;
+  margin:10px 0;
   border-radius:8px;
-  border:1px solid rgba(255,255,255,0.4);
-  background: rgba(255,255,255,0.25);
-  color:#fff;
-  outline:none;
-}
-
-input::placeholder,
-textarea::placeholder{
-  color:#eaeaea;
-}
-
-select option{
-  color:#000;
-}
-
-/* ===== BUTTON ===== */
-button{
-  background: rgba(13,110,253,0.9);
-  color:#fff;
   border:none;
-  cursor:pointer;
-  font-weight:bold;
 }
-
-button:hover{
-  background: rgba(13,110,253,1);
-}
-
-/* ===== MESSAGE ===== */
-#msg{
-  margin-top:10px;
-  text-align:center;
-  font-weight:bold;
-}
-
-/* ===== STATUS BOX ===== */
-#statusBox{
-  margin-top:10px;
-}
-
-/* ===== STATUS CARD ===== */
-.status-card{
-  border:1px solid rgba(255,255,255,0.3);
-  padding:10px;
-  margin-bottom:10px;
-  border-radius:10px;
-  background: rgba(255,255,255,0.15);
-}
-
-.badge{
-  padding:4px 12px;
-  border-radius:20px;
+button{
+  background:#28a745;
   color:#fff;
-  font-size:13px;
-}
-
-/* ===== ANIMATION ===== */
-@keyframes fadeUp{
-  from{
-    opacity:0;
-    transform:translateY(30px) scale(.95);
-  }
-  to{
-    opacity:1;
-    transform:translateY(0) scale(1);
-  }
-}
-
-/* ===== MOBILE ===== */
-@media(max-width:480px){
-  .card{
-    padding:20px;
-  }
+  font-weight:bold;
+  cursor:pointer;
 }
 </style>
 </head>
@@ -133,44 +43,19 @@ button:hover{
 <body>
 
 <div class="card">
-  <h2>🔧 New Booking</h2>
+  <h2>👤 Customer Register</h2>
 
-  <form id="bookingForm">
-    <input id="name" placeholder="Full Name" required>
-    <input id="phone" placeholder="Phone Number" required>
-    <input id="address" placeholder="Address" required>
+  <input type="email" id="email" placeholder="Email">
+  <input type="password" id="password" placeholder="Password">
 
-    <select id="service" required>
-      <option value="">Select Service</option>
-      <option>PC Repair</option>
-      <option>Laptop Repair</option>
-      <option>Windows Install</option>
-      <option>Computer Assembly and Configuration</option>
-      <option>Software Install</option>
-    </select>
+  <button onclick="register()">Create Account</button>
 
-    <textarea id="problem" placeholder="Problem details"></textarea>
-    <input type="date" id="date" required>
-    <input type="time" id="time" required>
-
-    <button type="submit">Submit Booking</button>
-  </form>
-
-  <div id="msg"></div>
-
-  <hr style="border-color:rgba(255,255,255,0.3)">
-
-  <h3>📌 Your Booking Status</h3>
-  <div id="statusBox">Enter phone number to see status</div>
+  <p id="msg"></p>
 </div>
 
-<!-- ===== FIREBASE ===== -->
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-app.js";
-import {
-  getFirestore, collection, addDoc, serverTimestamp,
-  query, where, onSnapshot
-} from "https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore.js";
+import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-auth.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyDL2OFxYzmxKUp5edh6QtD2f5gkb6oZAv4",
@@ -179,82 +64,21 @@ const firebaseConfig = {
 };
 
 const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
+const auth = getAuth(app);
 
-/* ===== SUBMIT BOOKING ===== */
-document.getElementById("bookingForm").addEventListener("submit", async (e)=>{
-  e.preventDefault();
+window.register = ()=>{
+  const email = document.getElementById("email").value;
+  const password = document.getElementById("password").value;
+  const msg = document.getElementById("msg");
 
-  const phone = phoneInput.value.trim();
-
-  const data = {
-    name: name.value,
-    phone,
-    address: address.value,
-    service: service.value,
-    problem: problem.value,
-    date: date.value,
-    time: time.value,
-    status: "Pending",
-    createdAt: serverTimestamp()
-  };
-
-  try{
-    await addDoc(collection(db,"bookings"), data);
-    msg.textContent = "✅ Booking successful!";
-    loadHistory(phone);
-    e.target.reset();
-  }catch(err){
-    msg.textContent = "❌ " + err.message;
-  }
-});
-
-/* ===== CUSTOMER STATUS ===== */
-const phoneInput = document.getElementById("phone");
-const statusBox = document.getElementById("statusBox");
-const msg = document.getElementById("msg");
-
-function loadHistory(phone){
-  if(!phone) return;
-
-  const q = query(
-    collection(db,"bookings"),
-    where("phone","==",phone)
-  );
-
-  onSnapshot(q,(snap)=>{
-    if(snap.empty){
-      statusBox.innerHTML = "❌ No bookings found";
-      return;
-    }
-
-    let html="";
-    snap.forEach(doc=>{
-      const b = doc.data();
-      const color =
-        b.status==="Completed" ? "green" :
-        b.status==="Cancelled" ? "red" : "orange";
-
-      html += `
-        <div class="status-card">
-          <b>Service:</b> ${b.service}<br>
-          <b>Date:</b> ${b.date} ${b.time}<br>
-          <b>Problem:</b> ${b.problem || "-"}<br>
-          <b>Status:</b>
-          <span class="badge" style="background:${color}">
-            ${b.status}
-          </span>
-        </div>
-      `;
-    });
-
-    statusBox.innerHTML = html;
+  createUserWithEmailAndPassword(auth,email,password)
+  .then(()=>{
+    msg.textContent="✅ Account created. Please login.";
+  })
+  .catch(err=>{
+    msg.textContent="❌ "+err.message;
   });
-}
-
-phoneInput.addEventListener("change", ()=>{
-  loadHistory(phoneInput.value.trim());
-});
+};
 </script>
 
 </body>
