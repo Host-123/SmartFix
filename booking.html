@@ -43,7 +43,6 @@ input,select,textarea,button{
   font-size:15px;
 }
 
-/* placeholder clear */
 input::placeholder,
 textarea::placeholder{
   color:#f1f5f9;
@@ -51,15 +50,9 @@ textarea::placeholder{
   font-weight:500;
 }
 
-/* select text */
-select{
-  color:#ffffff;
-}
-select option{
-  color:#000;
-}
+select{color:#fff;}
+select option{color:#000;}
 
-/* focus effect */
 input:focus,
 textarea:focus,
 select:focus{
@@ -67,36 +60,32 @@ select:focus{
   box-shadow:0 0 0 2px rgba(13,110,253,.6);
 }
 
-/* date & time text clear */
 input[type="date"],
 input[type="time"]{
   color-scheme: dark;
 }
 
-/* textarea */
-textarea{
-  resize:none;
-}
+textarea{resize:none;}
 
-/* button */
 button{
   background:#0d6efd;
   border:none;
   font-weight:bold;
   cursor:pointer;
 }
-button:hover{
-  opacity:.9;
+button:hover{opacity:.9;}
+
+.logout{
+  background:#dc3545;
+  margin-bottom:10px;
 }
 
-/* messages */
 #msg{
   text-align:center;
   font-weight:bold;
   margin-top:10px;
 }
 
-/* status cards */
 .status-card{
   margin-top:10px;
   padding:10px;
@@ -116,6 +105,10 @@ button:hover{
 <body>
 
 <div class="card">
+
+  <!-- LOGOUT -->
+  <button class="logout" onclick="logout()">Logout</button>
+
   <h2>🔧 Book a Service</h2>
 
   <form id="bookingForm">
@@ -148,6 +141,9 @@ button:hover{
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-app.js";
 import {
+  getAuth, signOut, onAuthStateChanged
+} from "https://www.gstatic.com/firebasejs/12.8.0/firebase-auth.js";
+import {
   getFirestore, collection, addDoc, serverTimestamp,
   query, where, onSnapshot
 } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore.js";
@@ -159,37 +155,51 @@ const firebaseConfig = {
 };
 
 const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
 const db = getFirestore(app);
 
+/* ===== AUTH GUARD ===== */
+onAuthStateChanged(auth,user=>{
+  if(!user){
+    location.href="index.html";
+  }
+});
+
+/* ===== ELEMENTS ===== */
 const form = document.getElementById("bookingForm");
 const msg = document.getElementById("msg");
 const statusBox = document.getElementById("statusBox");
+
+const nameInput = document.getElementById("name");
 const phoneInput = document.getElementById("phone");
+const addressInput = document.getElementById("address");
+const serviceInput = document.getElementById("service");
+const problemInput = document.getElementById("problem");
+const dateInput = document.getElementById("date");
+const timeInput = document.getElementById("time");
 
 /* ===== SUBMIT BOOKING ===== */
 form.addEventListener("submit", async e=>{
   e.preventDefault();
 
-  const phone = phoneInput.value.trim();
-
   try{
     await addDoc(collection(db,"bookings"),{
-      name: name.value,
-      phone,
-      address: address.value,
-      service: service.value,
-      problem: problem.value,
-      date: date.value,
-      time: time.value,
-      status:"Pending",
+      name: nameInput.value,
+      phone: phoneInput.value,
+      address: addressInput.value,
+      service: serviceInput.value,
+      problem: problemInput.value,
+      date: dateInput.value,
+      time: timeInput.value,
+      status: "Pending",
       createdAt: serverTimestamp()
     });
 
     msg.textContent="✅ Booking successful!";
-    loadHistory(phone);
+    loadHistory(phoneInput.value);
     form.reset();
   }catch(err){
-    msg.textContent="❌ "+err.message;
+    msg.textContent="❌ " + err.message;
   }
 });
 
@@ -221,10 +231,12 @@ function loadHistory(phone){
   });
 }
 
-/* auto reload status */
-phoneInput.addEventListener("change", ()=>{
-  loadHistory(phoneInput.value.trim());
-});
+/* ===== LOGOUT ===== */
+window.logout = ()=>{
+  signOut(auth).then(()=>{
+    location.href="index.html";
+  });
+};
 </script>
 
 </body>
