@@ -6,117 +6,81 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
 <style>
-*{
-  box-sizing:border-box;
-  font-family: Arial, sans-serif;
-}
+*{box-sizing:border-box;font-family:Arial,sans-serif;}
 
 body{
   margin:0;
   min-height:100vh;
-  background: linear-gradient(120deg,#0f2027,#203a43,#2c5364);
+  background:linear-gradient(120deg,#0f2027,#203a43,#2c5364);
   color:#fff;
 }
 
-/* ===== GLASS HEADER ===== */
+/* HEADER */
 header{
-  background: rgba(255,255,255,0.15);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border-bottom:1px solid rgba(255,255,255,0.3);
+  background:rgba(255,255,255,.15);
+  backdrop-filter:blur(12px);
   padding:20px;
   text-align:center;
   position:relative;
 }
-
 .logout{
   position:absolute;
   right:20px;
   top:20px;
-  background: rgba(220,53,69,0.7);
+  background:#dc3545;
 }
 
-/* ===== GLASS CONTAINER ===== */
+/* CONTAINER */
 .container{
   max-width:1200px;
   margin:30px auto;
   padding:20px;
-
-  background: rgba(255,255,255,0.15);
-  backdrop-filter: blur(15px);
-  -webkit-backdrop-filter: blur(15px);
-
+  background:rgba(255,255,255,.15);
+  backdrop-filter:blur(15px);
   border-radius:16px;
-  border:1px solid rgba(255,255,255,0.3);
-  box-shadow:0 8px 32px rgba(0,0,0,0.35);
+  border:1px solid rgba(255,255,255,.3);
 }
 
-/* ===== BUTTON ===== */
-button{
-  padding:6px 14px;
-  border-radius:8px;
-  cursor:pointer;
-  border:1px solid rgba(255,255,255,0.3);
-  background: rgba(255,255,255,0.2);
-  color:#fff;
-  backdrop-filter: blur(6px);
+/* SUMMARY */
+.summary{
+  display:flex;
+  gap:15px;
+  margin-bottom:15px;
 }
-
-button:hover{
-  background: rgba(255,255,255,0.35);
+.card{
+  flex:1;
+  padding:15px;
+  text-align:center;
+  border-radius:12px;
+  background:rgba(255,255,255,.18);
 }
+.card h2{margin:0;font-size:26px;}
+.card p{margin:5px 0 0;opacity:.8;}
 
-.edit{ }
-.done{ background: rgba(40,167,69,0.6); }
-
-/* ===== TABLE ===== */
+/* TABLE */
 table{
   width:100%;
   border-collapse:collapse;
-  margin-top:15px;
-  background: rgba(255,255,255,0.12);
-  backdrop-filter: blur(10px);
-  border-radius:12px;
-  overflow:hidden;
-}
-
-th,td{
-  padding:10px;
-  text-align:center;
-  border:1px solid rgba(255,255,255,0.2);
-  color:#fff;
-}
-
-th{
-  background: rgba(255,255,255,0.25);
-}
-
-/* ===== STATUS ===== */
-.status{
-  padding:4px 14px;
-  border-radius:20px;
-  font-size:13px;
-}
-
-.pending{
-  background: rgba(255,193,7,0.45);
-}
-
-.completed{
-  background: rgba(40,167,69,0.55);
-}
-
-/* ===== INFO ===== */
-#info{
   margin-top:10px;
 }
-
-/* ===== MOBILE ===== */
-@media(max-width:768px){
-  table{
-    font-size:13px;
-  }
+th,td{
+  padding:10px;
+  border:1px solid rgba(255,255,255,.25);
+  text-align:center;
 }
+th{
+  background:rgba(255,255,255,.25);
+}
+
+button{
+  padding:6px 10px;
+  border:none;
+  border-radius:6px;
+  cursor:pointer;
+  color:#fff;
+}
+.done{background:#28a745;}
+.delete{background:#dc3545;}
 </style>
 </head>
 
@@ -124,23 +88,36 @@ th{
 
 <header>
   <h1>📌 SmartFix Admin Dashboard</h1>
-  <p>All customer bookings appear here</p>
+  <p>Real-time booking management</p>
   <button class="logout" onclick="logout()">Logout</button>
 </header>
 
 <div class="container">
-  <button onclick="loadBookings()">🔄 Refresh</button>
-  <p id="info"></p>
 
-  <table id="table" style="display:none;">
+  <!-- SUMMARY CARDS -->
+  <div class="summary">
+    <div class="card">
+      <h2 id="total">0</h2>
+      <p>Total Bookings</p>
+    </div>
+    <div class="card">
+      <h2 id="pending">0</h2>
+      <p>Pending</p>
+    </div>
+    <div class="card">
+      <h2 id="completed">0</h2>
+      <p>Completed</p>
+    </div>
+  </div>
+
+  <!-- TABLE -->
+  <table>
     <thead>
       <tr>
         <th>#</th>
         <th>Name</th>
         <th>Phone</th>
-        <th>Address</th>
         <th>Service</th>
-        <th>Problem</th>
         <th>Date</th>
         <th>Time</th>
         <th>Status</th>
@@ -149,12 +126,16 @@ th{
     </thead>
     <tbody id="tbody"></tbody>
   </table>
+
 </div>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-app.js";
 import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-auth.js";
-import { getFirestore, collection, getDocs, updateDoc, doc } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore.js";
+import {
+  getFirestore, collection, onSnapshot,
+  updateDoc, deleteDoc, doc
+} from "https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyDL2OFxYzmxKUp5edh6QtD2f5gkb6oZAv4",
@@ -166,78 +147,66 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
+/* ADMIN GUARD */
 const ADMINS = ["student.student.on@gmail.com"];
-
-onAuthStateChanged(auth, (user)=>{
+onAuthStateChanged(auth,user=>{
   if(!user || !ADMINS.includes(user.email)){
     location.href="admin-login.html";
   }
 });
 
+/* LOGOUT */
 window.logout = ()=>{
   signOut(auth).then(()=>location.href="admin-login.html");
 };
 
-window.loadBookings = async ()=>{
-  const tbody = document.getElementById("tbody");
-  const info = document.getElementById("info");
+/* REALTIME BOOKINGS */
+const tbody = document.getElementById("tbody");
+const totalEl = document.getElementById("total");
+const pendingEl = document.getElementById("pending");
+const completedEl = document.getElementById("completed");
+
+onSnapshot(collection(db,"bookings"), snap=>{
   tbody.innerHTML="";
+  let i=1, pending=0, completed=0;
 
-  const snap = await getDocs(collection(db,"bookings"));
-  if(snap.empty){
-    info.textContent="❌ No bookings found";
-    return;
-  }
-
-  let i=1;
   snap.forEach(d=>{
     const b=d.data();
+    if(b.status==="Completed") completed++;
+    else pending++;
+
     tbody.innerHTML+=`
       <tr>
         <td>${i++}</td>
-        <td contenteditable>${b.name}</td>
-        <td contenteditable>${b.phone}</td>
-        <td contenteditable>${b.address}</td>
-        <td contenteditable>${b.service}</td>
-        <td contenteditable>${b.problem}</td>
-        <td contenteditable>${b.date}</td>
-        <td contenteditable>${b.time}</td>
+        <td>${b.name}</td>
+        <td>${b.phone}</td>
+        <td>${b.service}</td>
+        <td>${b.date}</td>
+        <td>${b.time}</td>
+        <td>${b.status}</td>
         <td>
-          <span class="status ${b.status==="Completed"?"completed":"pending"}">
-            ${b.status}
-          </span>
+          <button class="done" onclick="markDone('${d.id}')">✔</button>
+          <button class="delete" onclick="removeBooking('${d.id}')">🗑️</button>
         </td>
-        <td>
-          <button class="edit" onclick="saveEdit('${d.id}',this)">Save</button>
-          <button class="done" onclick="markDone('${d.id}')">Completed</button>
-        </td>
-      </tr>`;
+      </tr>
+    `;
   });
 
-  info.textContent=`✅ Total bookings: ${snap.size}`;
-  document.getElementById("table").style.display="table";
-};
+  totalEl.textContent = snap.size;
+  pendingEl.textContent = pending;
+  completedEl.textContent = completed;
+});
 
-window.saveEdit = async (id,btn)=>{
-  const td = btn.parentElement.parentElement.children;
-  await updateDoc(doc(db,"bookings",id),{
-    name: td[1].innerText,
-    phone: td[2].innerText,
-    address: td[3].innerText,
-    service: td[4].innerText,
-    problem: td[5].innerText,
-    date: td[6].innerText,
-    time: td[7].innerText
-  });
-  alert("✏️ Updated");
-};
-
-window.markDone = async (id)=>{
+/* ACTIONS */
+window.markDone = async(id)=>{
   await updateDoc(doc(db,"bookings",id),{status:"Completed"});
-  loadBookings();
 };
 
-loadBookings();
+window.removeBooking = async(id)=>{
+  if(confirm("Delete this booking?")){
+    await deleteDoc(doc(db,"bookings",id));
+  }
+};
 </script>
 
 </body>
