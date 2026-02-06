@@ -138,7 +138,9 @@ button:hover{opacity:.9;}
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-app.js";
-import { getAuth, signOut } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-auth.js";
+import { 
+  getAuth, onAuthStateChanged, signOut 
+} from "https://www.gstatic.com/firebasejs/12.8.0/firebase-auth.js";
 import {
   getFirestore, collection, addDoc, serverTimestamp,
   query, where, onSnapshot
@@ -155,31 +157,45 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
+/* 🔐 LOGIN GUARD */
+onAuthStateChanged(auth,user=>{
+  if(!user){
+    alert("Please login first");
+    location.href="index.html";
+  }
+});
+
 const phoneInput = document.getElementById("phone");
 const statusBox = document.getElementById("statusBox");
 const totalEl = document.getElementById("total");
 const pendingEl = document.getElementById("pending");
 const completedEl = document.getElementById("completed");
+const msg = document.getElementById("msg");
 
 /* SUBMIT BOOKING */
 bookingForm.addEventListener("submit", async e=>{
   e.preventDefault();
 
-  await addDoc(collection(db,"bookings"),{
-    name: name.value,
-    phone: phone.value,
-    address: address.value,
-    service: service.value,
-    problem: problem.value,
-    date: date.value,
-    time: time.value,
-    status:"Pending",
-    createdAt: serverTimestamp()
-  });
+  try{
+    await addDoc(collection(db,"bookings"),{
+      name: name.value,
+      phone: phone.value,
+      address: address.value,
+      service: service.value,
+      problem: problem.value,
+      date: date.value,
+      time: time.value,
+      status:"Pending",
+      createdAt: serverTimestamp()
+    });
 
-  msg.textContent="✅ Booking successful!";
-  refreshStatus();
-  bookingForm.reset();
+    msg.textContent="✅ Booking successful!";
+    refreshStatus();
+    bookingForm.reset();
+
+  }catch(err){
+    msg.textContent="❌ Booking failed: "+err.message;
+  }
 });
 
 /* LOAD STATUS */
