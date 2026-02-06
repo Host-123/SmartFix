@@ -53,6 +53,11 @@ button{
 }
 button:hover{opacity:.9;}
 
+.logout{
+  background:#dc3545;
+  margin-bottom:10px;
+}
+
 .refresh{
   background:#6c757d;
 }
@@ -89,6 +94,10 @@ button:hover{opacity:.9;}
 <body>
 
 <div class="card">
+
+  <!-- LOGOUT -->
+  <button class="logout" onclick="logout()">Logout</button>
+
   <h2>🔧 Book a Service</h2>
 
   <form id="bookingForm">
@@ -129,11 +138,13 @@ button:hover{opacity:.9;}
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-app.js";
+import { getAuth, signOut } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-auth.js";
 import {
   getFirestore, collection, addDoc, serverTimestamp,
   query, where, onSnapshot
 } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore.js";
 
+/* FIREBASE CONFIG */
 const firebaseConfig = {
   apiKey: "AIzaSyDL2OFxYzmxKUp5edh6QtD2f5gkb6oZAv4",
   authDomain: "smartfix-computer-service.firebaseapp.com",
@@ -141,11 +152,11 @@ const firebaseConfig = {
 };
 
 const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
 const db = getFirestore(app);
 
 const phoneInput = document.getElementById("phone");
 const statusBox = document.getElementById("statusBox");
-
 const totalEl = document.getElementById("total");
 const pendingEl = document.getElementById("pending");
 const completedEl = document.getElementById("completed");
@@ -204,9 +215,16 @@ function loadStatus(phone){
   });
 }
 
-/* REFRESH BUTTON */
+/* REFRESH */
 window.refreshStatus = ()=>{
   loadStatus(phoneInput.value.trim());
+};
+
+/* LOGOUT */
+window.logout = ()=>{
+  signOut(auth).then(()=>{
+    location.href="index.html";
+  });
 };
 </script>
 
