@@ -11,7 +11,6 @@
   font-family: Arial, sans-serif;
 }
 
-/* ===== BACKGROUND ===== */
 body{
   margin:0;
   height:100vh;
@@ -21,114 +20,44 @@ body{
   background: linear-gradient(120deg,#141e30,#243b55);
 }
 
-/* ===== GLASS LOGIN BOX ===== */
 .login-box{
   width:360px;
   padding:30px;
-
   background: rgba(255,255,255,0.18);
   backdrop-filter: blur(15px);
-  -webkit-backdrop-filter: blur(15px);
-
   border-radius:16px;
   border:1px solid rgba(255,255,255,0.3);
   box-shadow:0 8px 32px rgba(0,0,0,0.35);
-
   color:#fff;
-  animation: fadeUp 0.8s ease;
 }
-
-/* ===== TITLE ===== */
 .login-box h2{
   text-align:center;
   margin-bottom:20px;
 }
-
-.login-box h2 span{
-  margin-right:8px;
-  display:inline-block;
-  animation:pulse 1.5s infinite;
-}
-
-/* ===== INPUT ===== */
 .login-box input{
   width:100%;
   padding:12px;
   margin:10px 0;
-
   border-radius:8px;
   border:1px solid rgba(255,255,255,0.4);
   background: rgba(255,255,255,0.25);
   color:#fff;
-  outline:none;
 }
-
-.login-box input::placeholder{
-  color:#eaeaea;
-}
-
-/* ===== BUTTON ===== */
 .login-box button{
   width:100%;
   padding:12px;
   margin-top:15px;
-
   border:none;
   border-radius:8px;
   cursor:pointer;
-
-  background: rgba(40,167,69,0.85);
+  background:#28a745;
   color:#fff;
   font-weight:bold;
 }
-
-.login-box button:hover{
-  background: rgba(40,167,69,1);
-}
-
-/* ===== LINKS ===== */
-.links{
-  text-align:center;
-  margin-top:15px;
-}
-
-.links a{
-  color:#bcdcff;
-  text-decoration:none;
-  font-size:14px;
-}
-
-/* ===== ERROR ===== */
 #error{
   text-align:center;
   margin-top:10px;
   color:#ffb3b3;
-}
-
-/* ===== ANIMATION ===== */
-@keyframes fadeUp{
-  from{
-    opacity:0;
-    transform:translateY(30px) scale(0.95);
-  }
-  to{
-    opacity:1;
-    transform:translateY(0) scale(1);
-  }
-}
-
-@keyframes pulse{
-  0%{transform:scale(1);}
-  50%{transform:scale(1.15);}
-  100%{transform:scale(1);}
-}
-
-/* ===== MOBILE ===== */
-@media(max-width:480px){
-  .login-box{
-    width:90%;
-    padding:25px;
-  }
 }
 </style>
 </head>
@@ -136,28 +65,19 @@ body{
 <body>
 
 <div class="login-box">
-  <h2><span>👤</span>SmartFix Computer Service</h2>
+  <h2>👤 SmartFix Computer Service</h2>
 
   <input type="email" id="email" placeholder="Email">
   <input type="password" id="password" placeholder="Password">
 
   <button onclick="login()">Login</button>
-
   <p id="error"></p>
-
-  <div class="links">
-    <a href="customer-register.html">Create account</a>
-  </div>
 </div>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-app.js";
-import { 
-  getAuth, 
-  signInWithEmailAndPassword 
-} from "https://www.gstatic.com/firebasejs/12.8.0/firebase-auth.js";
+import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-auth.js";
 
-/* 🔥 FIREBASE CONFIG */
 const firebaseConfig = {
   apiKey: "AIzaSyDL2OFxYzmxKUp5edh6QtD2f5gkb6oZAv4",
   authDomain: "smartfix-computer-service.firebaseapp.com",
@@ -167,19 +87,19 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 
-/* LOGIN */
 window.login = ()=>{
-  const email = document.getElementById("email").value;
-  const password = document.getElementById("password").value;
+  const email = email.value;
+  const password = password.value;
   const error = document.getElementById("error");
 
   signInWithEmailAndPassword(auth,email,password)
-  .then(()=>{
-    location.href="customer-dashboard.html"; 
-  })
-  .catch(err=>{
-    error.textContent="❌ "+err.message;
-  });
+    .then(()=>{
+      // ✅ correct redirect
+      location.href = "booking.html";
+    })
+    .catch(err=>{
+      error.textContent = "❌ " + err.message;
+    });
 };
 </script>
 
