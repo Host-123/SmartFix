@@ -6,49 +6,117 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
 <style>
-body{
+*{
+  box-sizing:border-box;
   font-family: Arial, sans-serif;
-  background: linear-gradient(120deg,#0f2027,#203a43,#2c5364);
-  margin:0;
 }
-header{
-  background: linear-gradient(to right,#0d6efd,#00b4d8);
+
+body{
+  margin:0;
+  min-height:100vh;
+  background: linear-gradient(120deg,#0f2027,#203a43,#2c5364);
   color:#fff;
+}
+
+/* ===== GLASS HEADER ===== */
+header{
+  background: rgba(255,255,255,0.15);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom:1px solid rgba(255,255,255,0.3);
   padding:20px;
   text-align:center;
+  position:relative;
 }
+
+.logout{
+  position:absolute;
+  right:20px;
+  top:20px;
+  background: rgba(220,53,69,0.7);
+}
+
+/* ===== GLASS CONTAINER ===== */
 .container{
   max-width:1200px;
   margin:30px auto;
-  background:#fff;
-  border-radius:12px;
   padding:20px;
+
+  background: rgba(255,255,255,0.15);
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
+
+  border-radius:16px;
+  border:1px solid rgba(255,255,255,0.3);
+  box-shadow:0 8px 32px rgba(0,0,0,0.35);
 }
+
+/* ===== BUTTON ===== */
 button{
-  padding:6px 12px;
-  border:none;
-  border-radius:6px;
+  padding:6px 14px;
+  border-radius:8px;
   cursor:pointer;
+  border:1px solid rgba(255,255,255,0.3);
+  background: rgba(255,255,255,0.2);
+  color:#fff;
+  backdrop-filter: blur(6px);
 }
-.edit{background:#0d6efd;color:#fff;}
-.done{background:#28a745;color:#fff;}
-.logout{background:#dc3545;color:#fff;float:right}
+
+button:hover{
+  background: rgba(255,255,255,0.35);
+}
+
+.edit{ }
+.done{ background: rgba(40,167,69,0.6); }
+
+/* ===== TABLE ===== */
 table{
   width:100%;
   border-collapse:collapse;
+  margin-top:15px;
+  background: rgba(255,255,255,0.12);
+  backdrop-filter: blur(10px);
+  border-radius:12px;
+  overflow:hidden;
 }
+
 th,td{
   padding:10px;
-  border:1px solid #ddd;
   text-align:center;
+  border:1px solid rgba(255,255,255,0.2);
+  color:#fff;
 }
+
+th{
+  background: rgba(255,255,255,0.25);
+}
+
+/* ===== STATUS ===== */
 .status{
-  padding:4px 10px;
+  padding:4px 14px;
   border-radius:20px;
   font-size:13px;
 }
-.pending{background:#ffc107;}
-.completed{background:#28a745;color:#fff;}
+
+.pending{
+  background: rgba(255,193,7,0.45);
+}
+
+.completed{
+  background: rgba(40,167,69,0.55);
+}
+
+/* ===== INFO ===== */
+#info{
+  margin-top:10px;
+}
+
+/* ===== MOBILE ===== */
+@media(max-width:768px){
+  table{
+    font-size:13px;
+  }
+}
 </style>
 </head>
 
@@ -85,12 +153,8 @@ th,td{
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-app.js";
-import { 
-  getAuth, onAuthStateChanged, signOut 
-} from "https://www.gstatic.com/firebasejs/12.8.0/firebase-auth.js";
-import { 
-  getFirestore, collection, getDocs, updateDoc, doc 
-} from "https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore.js";
+import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-auth.js";
+import { getFirestore, collection, getDocs, updateDoc, doc } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyDL2OFxYzmxKUp5edh6QtD2f5gkb6oZAv4",
@@ -102,27 +166,22 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-/* ✅ ADMIN LIST */
 const ADMINS = ["student.student.on@gmail.com"];
 
-onAuthStateChanged(auth, (user) => {
-  if (!user || !ADMINS.includes(user.email)) {
-    location.href = "admin-login.html";
+onAuthStateChanged(auth, (user)=>{
+  if(!user || !ADMINS.includes(user.email)){
+    location.href="admin-login.html";
   }
 });
 
-/* LOGOUT */
 window.logout = ()=>{
-  signOut(auth).then(()=>{
-    location.href="admin-login.html";
-  });
+  signOut(auth).then(()=>location.href="admin-login.html");
 };
 
-/* LOAD BOOKINGS */
 window.loadBookings = async ()=>{
   const tbody = document.getElementById("tbody");
   const info = document.getElementById("info");
-  tbody.innerHTML = "";
+  tbody.innerHTML="";
 
   const snap = await getDocs(collection(db,"bookings"));
   if(snap.empty){
