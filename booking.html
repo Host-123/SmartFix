@@ -26,32 +26,77 @@ body{
   border:1px solid rgba(255,255,255,.3);
 }
 
-h2,h3{text-align:center;margin-top:0;}
-
-input,select,textarea,button{
-  width:100%;
-  padding:10px;
-  margin:8px 0;
-  border-radius:8px;
-  border:1px solid rgba(255,255,255,.4);
-  background:rgba(255,255,255,.25);
-  color:#fff;
+h2,h3{
+  text-align:center;
+  margin-top:0;
 }
 
-select option{color:#000;}
-textarea{resize:none;}
+/* ===== INPUTS ===== */
+input,select,textarea,button{
+  width:100%;
+  padding:12px;
+  margin:8px 0;
+  border-radius:8px;
+  border:1px solid rgba(255,255,255,.45);
+  background:rgba(255,255,255,.28);
+  color:#ffffff;
+  font-size:15px;
+}
 
+/* placeholder clear */
+input::placeholder,
+textarea::placeholder{
+  color:#f1f5f9;
+  opacity:1;
+  font-weight:500;
+}
+
+/* select text */
+select{
+  color:#ffffff;
+}
+select option{
+  color:#000;
+}
+
+/* focus effect */
+input:focus,
+textarea:focus,
+select:focus{
+  outline:none;
+  box-shadow:0 0 0 2px rgba(13,110,253,.6);
+}
+
+/* date & time text clear */
+input[type="date"],
+input[type="time"]{
+  color-scheme: dark;
+}
+
+/* textarea */
+textarea{
+  resize:none;
+}
+
+/* button */
 button{
   background:#0d6efd;
   border:none;
   font-weight:bold;
   cursor:pointer;
 }
+button:hover{
+  opacity:.9;
+}
 
-button:hover{opacity:.9;}
+/* messages */
+#msg{
+  text-align:center;
+  font-weight:bold;
+  margin-top:10px;
+}
 
-#msg{text-align:center;font-weight:bold;margin-top:10px;}
-
+/* status cards */
 .status-card{
   margin-top:10px;
   padding:10px;
@@ -107,7 +152,6 @@ import {
   query, where, onSnapshot
 } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore.js";
 
-/* 🔥 FIREBASE CONFIG */
 const firebaseConfig = {
   apiKey: "AIzaSyDL2OFxYzmxKUp5edh6QtD2f5gkb6oZAv4",
   authDomain: "smartfix-computer-service.firebaseapp.com",
@@ -149,12 +193,11 @@ form.addEventListener("submit", async e=>{
   }
 });
 
-/* ===== LOAD CUSTOMER STATUS ===== */
+/* ===== LOAD STATUS ===== */
 function loadHistory(phone){
   if(!phone) return;
 
   const q = query(collection(db,"bookings"), where("phone","==",phone));
-  onparse(q,snap=>{});
   onSnapshot(q,snap=>{
     if(snap.empty){
       statusBox.textContent="❌ No bookings found";
@@ -178,7 +221,7 @@ function loadHistory(phone){
   });
 }
 
-/* auto load status when phone changes */
+/* auto reload status */
 phoneInput.addEventListener("change", ()=>{
   loadHistory(phoneInput.value.trim());
 });
