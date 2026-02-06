@@ -2,46 +2,91 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>SmartFix – Register</title>
+<title>SmartFix Computer Service</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
 <style>
 *{box-sizing:border-box;font-family:Arial,sans-serif;}
+
 body{
-  margin:0;height:100vh;display:flex;justify-content:center;align-items:center;
+  margin:0;
+  height:100vh;
+  display:flex;
+  justify-content:center;
+  align-items:center;
   background:linear-gradient(120deg,#141e30,#243b55);
 }
+
 .card{
-  width:360px;padding:30px;
+  width:360px;
+  padding:30px;
   background:rgba(255,255,255,.18);
   backdrop-filter:blur(15px);
-  border-radius:16px;border:1px solid rgba(255,255,255,.3);
+  border-radius:16px;
+  border:1px solid rgba(255,255,255,.3);
+  color:#fff;
+  text-align:center;
+}
+
+input{
+  width:100%;
+  padding:12px;
+  margin:10px 0;
+  border-radius:8px;
+  border:none;
+  background:rgba(255,255,255,.25);
   color:#fff;
 }
-input,button{
-  width:100%;padding:12px;margin:10px 0;border-radius:8px;border:none;
+
+button{
+  width:100%;
+  padding:12px;
+  margin-top:10px;
+  border:none;
+  border-radius:8px;
+  font-weight:bold;
+  cursor:pointer;
 }
-input{background:rgba(255,255,255,.25);color:#fff;}
-button{background:#28a745;color:#fff;font-weight:bold;cursor:pointer;}
-#msg{text-align:center;margin-top:10px;}
-a{color:#bcdcff;text-decoration:none;display:block;text-align:center;margin-top:10px;}
+
+.login-btn{
+  background:#28a745;
+  color:#fff;
+}
+
+.register-btn{
+  background:#0d6efd;
+  color:#fff;
+}
+
+#error{
+  margin-top:10px;
+  color:#ffb3b3;
+}
 </style>
 </head>
 
 <body>
+
 <div class="card">
-  <h2>👤 Customer Register</h2>
+  <h2>👤 SmartFix Computer Service</h2>
+
   <input type="email" id="email" placeholder="Email">
   <input type="password" id="password" placeholder="Password">
-  <button onclick="register()">Create Account</button>
-  <div id="msg"></div>
-  <a href="index.html">Already have account? Login</a>
+
+  <!-- LOGIN BUTTON -->
+  <button class="login-btn" onclick="login()">Login</button>
+
+  <!-- CREATE ACCOUNT BUTTON -->
+  <button class="register-btn" onclick="goRegister()">Create Account</button>
+
+  <div id="error"></div>
 </div>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-app.js";
-import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-auth.js";
+import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-auth.js";
 
+/* FIREBASE CONFIG */
 const firebaseConfig = {
   apiKey: "AIzaSyDL2OFxYzmxKUp5edh6QtD2f5gkb6oZAv4",
   authDomain: "smartfix-computer-service.firebaseapp.com",
@@ -51,15 +96,18 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 
-window.register = ()=>{
-  createUserWithEmailAndPassword(auth,email.value,password.value)
-  .then(()=>{
-    msg.textContent="✅ Account created. Now login.";
-  })
-  .catch(e=>{
-    msg.textContent="❌ "+e.message;
-  });
+/* LOGIN */
+window.login = ()=>{
+  signInWithEmailAndPassword(auth,email.value,password.value)
+    .then(()=>location.href="booking.html")
+    .catch(e=>error.textContent="❌ "+e.message);
+};
+
+/* GO TO REGISTER PAGE */
+window.goRegister = ()=>{
+  location.href = "customer-register.html";
 };
 </script>
+
 </body>
 </html>
