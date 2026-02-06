@@ -2,11 +2,12 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>SmartFix – Booking</title>
+<title>SmartFix – Book Service</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
 <style>
 *{box-sizing:border-box;font-family:Arial,sans-serif;}
+
 body{
   margin:0;
   min-height:100vh;
@@ -14,42 +15,55 @@ body{
   background:linear-gradient(135deg,#0f2027,#203a43,#2c5364);
   color:#fff;
 }
+
 .card{
   max-width:520px;
   margin:auto;
   padding:25px;
-  background:rgba(255,255,255,0.18);
+  background:rgba(255,255,255,.18);
   backdrop-filter:blur(15px);
   border-radius:16px;
-  border:1px solid rgba(255,255,255,0.3);
+  border:1px solid rgba(255,255,255,.3);
 }
+
+h2,h3{text-align:center;margin-top:0;}
+
 input,select,textarea,button{
   width:100%;
   padding:10px;
   margin:8px 0;
   border-radius:8px;
-  border:1px solid rgba(255,255,255,0.4);
-  background:rgba(255,255,255,0.25);
+  border:1px solid rgba(255,255,255,.4);
+  background:rgba(255,255,255,.25);
   color:#fff;
 }
+
 select option{color:#000;}
+textarea{resize:none;}
+
 button{
   background:#0d6efd;
   border:none;
   font-weight:bold;
   cursor:pointer;
 }
-#msg{text-align:center;font-weight:bold;}
+
+button:hover{opacity:.9;}
+
+#msg{text-align:center;font-weight:bold;margin-top:10px;}
+
 .status-card{
   margin-top:10px;
   padding:10px;
   border-radius:10px;
-  background:rgba(255,255,255,0.15);
+  background:rgba(255,255,255,.15);
 }
+
 .badge{
   padding:4px 12px;
   border-radius:20px;
   color:#fff;
+  font-size:13px;
 }
 </style>
 </head>
@@ -57,7 +71,7 @@ button{
 <body>
 
 <div class="card">
-  <h2>🔧 New Booking</h2>
+  <h2>🔧 Book a Service</h2>
 
   <form id="bookingForm">
     <input id="name" placeholder="Full Name" required>
@@ -72,7 +86,7 @@ button{
       <option>Software Install</option>
     </select>
 
-    <textarea id="problem" placeholder="Problem details"></textarea>
+    <textarea id="problem" rows="3" placeholder="Problem details (optional)"></textarea>
     <input type="date" id="date" required>
     <input type="time" id="time" required>
 
@@ -80,14 +94,20 @@ button{
   </form>
 
   <div id="msg"></div>
+
   <h3>📌 Your Booking Status</h3>
-  <div id="statusBox"></div>
+  <div id="statusBox">Enter phone number to see status</div>
 </div>
 
+<!-- ===== FIREBASE ===== -->
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-app.js";
-import { getFirestore, collection, addDoc, serverTimestamp, query, where, onSnapshot } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore.js";
+import {
+  getFirestore, collection, addDoc, serverTimestamp,
+  query, where, onSnapshot
+} from "https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore.js";
 
+/* 🔥 FIREBASE CONFIG */
 const firebaseConfig = {
   apiKey: "AIzaSyDL2OFxYzmxKUp5edh6QtD2f5gkb6oZAv4",
   authDomain: "smartfix-computer-service.firebaseapp.com",
@@ -100,32 +120,47 @@ const db = getFirestore(app);
 const form = document.getElementById("bookingForm");
 const msg = document.getElementById("msg");
 const statusBox = document.getElementById("statusBox");
+const phoneInput = document.getElementById("phone");
 
+/* ===== SUBMIT BOOKING ===== */
 form.addEventListener("submit", async e=>{
   e.preventDefault();
 
-  const phone = document.getElementById("phone").value.trim();
+  const phone = phoneInput.value.trim();
 
-  await addDoc(collection(db,"bookings"),{
-    name: name.value,
-    phone,
-    address: address.value,
-    service: service.value,
-    problem: problem.value,
-    date: date.value,
-    time: time.value,
-    status:"Pending",
-    createdAt: serverTimestamp()
-  });
+  try{
+    await addDoc(collection(db,"bookings"),{
+      name: name.value,
+      phone,
+      address: address.value,
+      service: service.value,
+      problem: problem.value,
+      date: date.value,
+      time: time.value,
+      status:"Pending",
+      createdAt: serverTimestamp()
+    });
 
-  msg.textContent="✅ Booking successful!";
-  loadHistory(phone);
-  form.reset();
+    msg.textContent="✅ Booking successful!";
+    loadHistory(phone);
+    form.reset();
+  }catch(err){
+    msg.textContent="❌ "+err.message;
+  }
 });
 
+/* ===== LOAD CUSTOMER STATUS ===== */
 function loadHistory(phone){
+  if(!phone) return;
+
   const q = query(collection(db,"bookings"), where("phone","==",phone));
+  onparse(q,snap=>{});
   onSnapshot(q,snap=>{
+    if(snap.empty){
+      statusBox.textContent="❌ No bookings found";
+      return;
+    }
+
     statusBox.innerHTML="";
     snap.forEach(d=>{
       const b=d.data();
@@ -134,11 +169,19 @@ function loadHistory(phone){
         <div class="status-card">
           <b>${b.service}</b><br>
           ${b.date} ${b.time}<br>
-          <span class="badge" style="background:${color}">${b.status}</span>
-        </div>`;
+          <span class="badge" style="background:${color}">
+            ${b.status}
+          </span>
+        </div>
+      `;
     });
   });
 }
+
+/* auto load status when phone changes */
+phoneInput.addEventListener("change", ()=>{
+  loadHistory(phoneInput.value.trim());
+});
 </script>
 
 </body>
