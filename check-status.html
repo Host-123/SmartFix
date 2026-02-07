@@ -18,6 +18,7 @@ body{
   color:#fff;
 }
 
+/* ===== CARD ===== */
 .card{
   width:360px;
   padding:25px;
@@ -28,6 +29,7 @@ body{
   text-align:center;
 }
 
+/* ===== INPUT / BUTTON ===== */
 input,button{
   width:100%;
   padding:12px;
@@ -40,17 +42,34 @@ input{
   background:rgba(255,255,255,.28);
   color:#fff;
 }
-input::placeholder{
-  color:#f1f5f9;
-}
+input::placeholder{color:#f1f5f9;}
 
 button{
-  background:#0d6efd;
-  color:#fff;
   font-weight:bold;
   cursor:pointer;
+  transition:all .25s ease;
 }
 
+/* ===== BUTTONS ===== */
+.refresh{
+  background:#0d6efd;
+  color:#fff;
+}
+.refresh:hover{
+  background:#0b5ed7;
+  transform:scale(1.03);
+}
+
+.back{
+  background:#198754;
+  color:#fff;
+}
+.back:hover{
+  background:#157347;
+  transform:scale(1.03);
+}
+
+/* ===== STATUS CARD ===== */
 .status-card{
   margin-top:10px;
   padding:10px;
@@ -73,12 +92,12 @@ button{
   <h2>📌 Check Booking Status</h2>
 
   <input id="phone" placeholder="Enter Phone Number">
-  <button onclick="checkStatus()">Check Status</button>
+
+  <button class="refresh" onclick="checkStatus()">🔄 Refresh Status Check</button>
 
   <div id="result"></div>
 
-  <br>
-  <a href="booking.html" style="color:#bcdcff;text-decoration:none;">⬅ Back to Booking</a>
+  <button class="back" onclick="goBack()">⬅ Back to Booking</button>
 </div>
 
 <script type="module">
@@ -119,7 +138,7 @@ window.checkStatus = async ()=>{
 
   snap.forEach(d=>{
     const b=d.data();
-    const color=b.status==="Completed"?"green":"orange";
+    const color=b.status==="Completed" ? "green" : "orange";
 
     result.innerHTML+=`
       <div class="status-card">
@@ -131,6 +150,11 @@ window.checkStatus = async ()=>{
       </div>
     `;
   });
+};
+
+/* BACK TO BOOKING */
+window.goBack = ()=>{
+  window.location.href="booking.html";
 };
 </script>
 
