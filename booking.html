@@ -2,20 +2,36 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>SmartFix – Book Service</title>
+<title>SmartFix | Book Service</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
 <style>
 *{box-sizing:border-box;font-family:Arial,sans-serif;}
+
 body{
   margin:0;
   min-height:100vh;
-  padding:40px 15px;
+  padding:20px;
   background:linear-gradient(135deg,#0f2027,#203a43,#2c5364);
   color:#fff;
 }
+
+/* LOGOUT */
+.logout{
+  background:#dc3545;
+  color:#fff;
+  padding:10px;
+  border-radius:8px;
+  border:none;
+  width:100%;
+  font-weight:bold;
+  cursor:pointer;
+  margin-bottom:15px;
+}
+
+/* CARD */
 .card{
-  max-width:520px;
+  max-width:420px;
   margin:auto;
   padding:25px;
   background:rgba(255,255,255,.18);
@@ -23,52 +39,77 @@ body{
   border-radius:16px;
   border:1px solid rgba(255,255,255,.3);
 }
-h2,h3{text-align:center;margin-top:0;}
+
+/* INPUTS */
 input,select,textarea,button{
   width:100%;
   padding:12px;
   margin:8px 0;
   border-radius:8px;
-  border:1px solid rgba(255,255,255,.45);
+  border:none;
+}
+
+input,select,textarea{
   background:rgba(255,255,255,.28);
   color:#fff;
 }
 input::placeholder,textarea::placeholder{
   color:#f1f5f9;
-  opacity:1;
 }
+
 select option{color:#000;}
-button{
+textarea{resize:none}
+
+/* BUTTONS */
+.submit{
   background:#0d6efd;
-  border:none;
+  color:#fff;
   font-weight:bold;
   cursor:pointer;
 }
-.logout{background:#dc3545;margin-bottom:10px;}
-.refresh{background:#6c757d;}
+
+.refresh{
+  background:#0d6efd;
+  color:#fff;
+  font-weight:bold;
+  cursor:pointer;
+}
+
+.back{
+  background:#198754;
+  color:#fff;
+  font-weight:bold;
+  cursor:pointer;
+}
+
+button:hover{
+  transform:scale(1.03);
+}
+
+/* STATUS */
+.status-box{
+  margin-top:15px;
+}
+
+.status-summary{
+  display:flex;
+  gap:8px;
+  margin-bottom:8px;
+}
+
+.badge{
+  flex:1;
+  padding:8px;
+  text-align:center;
+  border-radius:8px;
+  background:rgba(255,255,255,.2);
+}
+
 .status-card{
-  margin-top:8px;
+  background:rgba(255,255,255,.15);
   padding:10px;
   border-radius:10px;
-  background:rgba(255,255,255,.15);
-}
-.badge{
-  padding:4px 12px;
-  border-radius:20px;
-  font-size:13px;
-  color:#fff;
-}
-.summary{
-  display:flex;
-  gap:10px;
-  margin:10px 0;
-}
-.summary div{
-  flex:1;
-  text-align:center;
-  padding:8px;
-  border-radius:10px;
-  background:rgba(255,255,255,.15);
+  margin-top:8px;
 }
 </style>
 </head>
@@ -79,7 +120,7 @@ button{
 
 <button class="logout" onclick="logout()">Logout</button>
 
-<h2>🔧 Book a Service</h2>
+<h2 style="text-align:center;">🔧 Book a Service</h2>
 
 <form id="bookingForm">
   <input id="name" placeholder="Full Name" required>
@@ -98,30 +139,35 @@ button{
   <input type="date" id="date" required>
   <input type="time" id="time" required>
 
-  <button type="submit">Submit Booking</button>
+  <button class="submit" type="submit">Submit Booking</button>
 </form>
 
-<p id="msg"></p>
+<div id="msg"></div>
 
-<h3>📌 Your Booking Status</h3>
+<h3 style="text-align:center;margin-top:20px;">📌 Your Booking Status</h3>
 
-<div class="summary">
-  <div>Total: <b id="total">0</b></div>
-  <div>Pending: <b id="pending">0</b></div>
-  <div>Completed: <b id="completed">0</b></div>
+<div class="status-summary">
+  <div class="badge">Total: <span id="total">0</span></div>
+  <div class="badge">Pending: <span id="pending">0</span></div>
+  <div class="badge">Completed: <span id="completed">0</span></div>
 </div>
 
-<button class="refresh" onclick="refreshStatus()">🔄 Refresh Status</button>
-<div id="statusBox">Enter phone number to see status</div>
+<button class="refresh" onclick="refreshStatus()">🔄 Refresh Status Check</button>
+<button class="back" onclick="backToBooking()">⬅ Back to Booking</button>
+
+<div id="statusBox" class="status-box"></div>
 
 </div>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-app.js";
-import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-auth.js";
-import { getFirestore, collection, addDoc, serverTimestamp, query, where, onSnapshot } 
-from "https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore.js";
+import { getAuth, signOut } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-auth.js";
+import {
+  getFirestore, collection, addDoc, serverTimestamp,
+  query, where, getDocs
+} from "https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore.js";
 
+/* FIREBASE */
 const firebaseConfig = {
   apiKey: "AIzaSyDL2OFxYzmxKUp5edh6QtD2f5gkb6oZAv4",
   authDomain: "smartfix-computer-service.firebaseapp.com",
@@ -132,83 +178,72 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-/* LOGIN GUARD */
-onAuthStateChanged(auth,user=>{
-  if(!user){
-    alert("Please login first");
-    location.href="index.html";
-  }
-});
-
-/* ELEMENTS */
-const bookingForm = document.getElementById("bookingForm");
-const nameInput = document.getElementById("name");
-const phoneInput = document.getElementById("phone");
-const addressInput = document.getElementById("address");
-const serviceInput = document.getElementById("service");
-const problemInput = document.getElementById("problem");
-const dateInput = document.getElementById("date");
-const timeInput = document.getElementById("time");
-
-const statusBox = document.getElementById("statusBox");
-const totalEl = document.getElementById("total");
-const pendingEl = document.getElementById("pending");
-const completedEl = document.getElementById("completed");
+const form = document.getElementById("bookingForm");
 const msg = document.getElementById("msg");
+const statusBox = document.getElementById("statusBox");
+
+/* LOGOUT */
+window.logout = ()=>{
+  signOut(auth).then(()=>location.href="index.html");
+};
 
 /* SUBMIT BOOKING */
-bookingForm.addEventListener("submit", async e=>{
+form.addEventListener("submit", async e=>{
   e.preventDefault();
+
   try{
     await addDoc(collection(db,"bookings"),{
-      name: nameInput.value,
-      phone: phoneInput.value,
-      address: addressInput.value,
-      service: serviceInput.value,
-      problem: problemInput.value,
-      date: dateInput.value,
-      time: timeInput.value,
+      name:name.value,
+      phone:phone.value,
+      address:address.value,
+      service:service.value,
+      problem:problem.value,
+      date:date.value,
+      time:time.value,
       status:"Pending",
-      createdAt: serverTimestamp()
+      createdAt:serverTimestamp()
     });
+
     msg.textContent="✅ Booking successful!";
+    form.reset();
     refreshStatus();
-    bookingForm.reset();
   }catch(err){
-    msg.textContent="❌ Booking failed: "+err.message;
+    msg.textContent="❌ "+err.message;
   }
 });
 
 /* LOAD STATUS */
-function loadStatus(phone){
-  if(!phone) return;
-  const q=query(collection(db,"bookings"),where("phone","==",phone));
-  onSnapshot(q,snap=>{
-    let t=0,p=0,c=0;
-    statusBox.innerHTML="";
-    snap.forEach(d=>{
-      t++;
-      const b=d.data();
-      b.status==="Completed"?c++:p++;
-      statusBox.innerHTML+=`
-        <div class="status-card">
-          <b>${b.service}</b><br>${b.date} ${b.time}<br>
-          <span class="badge" style="background:${b.status==="Completed"?"green":"orange"}">
-            ${b.status}
-          </span>
-        </div>`;
-    });
-    totalEl.textContent=t;
-    pendingEl.textContent=p;
-    completedEl.textContent=c;
+window.refreshStatus = async ()=>{
+  statusBox.innerHTML="";
+  let total=0,pending=0,completed=0;
+
+  const q = query(collection(db,"bookings"), where("phone","==",phone.value));
+  const snap = await getDocs(q);
+
+  snap.forEach(d=>{
+    const b=d.data();
+    total++;
+    if(b.status==="Completed") completed++;
+    else pending++;
+
+    statusBox.innerHTML+=`
+      <div class="status-card">
+        <b>${b.service}</b><br>
+        ${b.date} ${b.time}<br>
+        Status: ${b.status}
+      </div>
+    `;
   });
-}
 
-/* REFRESH */
-window.refreshStatus=()=>loadStatus(phoneInput.value);
+  document.getElementById("total").innerText=total;
+  document.getElementById("pending").innerText=pending;
+  document.getElementById("completed").innerText=completed;
+};
 
-/* LOGOUT */
-window.logout=()=>signOut(auth).then(()=>location.href="index.html");
+/* BACK TO BOOKING */
+window.backToBooking = ()=>{
+  window.scrollTo({top:0,behavior:"smooth"});
+};
 </script>
 
 </body>
