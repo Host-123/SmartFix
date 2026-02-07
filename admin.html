@@ -7,7 +7,6 @@
 
 <style>
 *{box-sizing:border-box;font-family:Arial,sans-serif;}
-
 body{
   margin:0;
   min-height:100vh;
@@ -17,10 +16,10 @@ body{
 
 /* HEADER */
 header{
-  background:rgba(255,255,255,.15);
-  backdrop-filter:blur(12px);
   padding:20px;
   text-align:center;
+  background:rgba(255,255,255,.15);
+  backdrop-filter:blur(12px);
   position:relative;
 }
 .logout{
@@ -38,8 +37,20 @@ header{
   background:rgba(255,255,255,.15);
   backdrop-filter:blur(15px);
   border-radius:16px;
-  border:1px solid rgba(255,255,255,.3);
 }
+
+/* BUTTONS */
+button{
+  padding:6px 10px;
+  border:none;
+  border-radius:6px;
+  cursor:pointer;
+  color:#fff;
+}
+.refresh{background:#6c757d;margin-bottom:10px;}
+.done{background:#28a745;}
+.delete{background:#dc3545;}
+.view{background:#0d6efd;}
 
 /* SUMMARY */
 .summary{
@@ -49,38 +60,41 @@ header{
 }
 .card{
   flex:1;
-  padding:15px;
   text-align:center;
+  padding:15px;
   border-radius:12px;
   background:rgba(255,255,255,.18);
 }
-.card h2{margin:0;font-size:26px;}
-.card p{margin:5px 0 0;opacity:.8;}
 
 /* TABLE */
 table{
   width:100%;
   border-collapse:collapse;
-  margin-top:10px;
 }
 th,td{
   padding:10px;
   border:1px solid rgba(255,255,255,.25);
   text-align:center;
 }
-th{
-  background:rgba(255,255,255,.25);
-}
+th{background:rgba(255,255,255,.25);}
 
-button{
-  padding:6px 10px;
-  border:none;
-  border-radius:6px;
-  cursor:pointer;
-  color:#fff;
+/* MODAL */
+.modal{
+  display:none;
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.6);
+  justify-content:center;
+  align-items:center;
 }
-.done{background:#28a745;}
-.delete{background:#dc3545;}
+.modal-content{
+  background:#1f3b44;
+  padding:20px;
+  border-radius:12px;
+  width:90%;
+  max-width:400px;
+}
+.close{background:#dc3545;width:100%;}
 </style>
 </head>
 
@@ -94,48 +108,36 @@ button{
 
 <div class="container">
 
-  <!-- SUMMARY CARDS -->
-  <div class="summary">
-    <div class="card">
-      <h2 id="total">0</h2>
-      <p>Total Bookings</p>
-    </div>
-    <div class="card">
-      <h2 id="pending">0</h2>
-      <p>Pending</p>
-    </div>
-    <div class="card">
-      <h2 id="completed">0</h2>
-      <p>Completed</p>
-    </div>
-  </div>
+<button class="refresh" onclick="loadBookings()">🔄 Refresh</button>
 
-  <!-- TABLE -->
-  <table>
-    <thead>
-      <tr>
-        <th>#</th>
-        <th>Name</th>
-        <th>Phone</th>
-        <th>Service</th>
-        <th>Date</th>
-        <th>Time</th>
-        <th>Status</th>
-        <th>Action</th>
-      </tr>
-    </thead>
-    <tbody id="tbody"></tbody>
-  </table>
+<!-- SUMMARY -->
+<div class="summary">
+  <div class="card"><h2 id="total">0</h2><p>Total</p></div>
+  <div class="card"><h2 id="pending">0</h2><p>Pending</p></div>
+  <div class="card"><h2 id="completed">0</h2><p>Completed</p></div>
+</div>
 
+<table>
+<thead>
+<tr>
+  <th>#</th><th>Name</th><th>Phone</th><th>Service</th>
+  <th>Date</th><th>Time</th><th>Status</th><th>Action</th>
+</tr>
+</thead>
+<tbody id="tbody"></tbody>
+</table>
+
+</div>
+
+<!-- VIEW DETAILS MODAL -->
+<div class="modal" id="modal">
+  <div class="modal-content" id="modalContent"></div>
 </div>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-app.js";
 import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-auth.js";
-import {
-  getFirestore, collection, onSnapshot,
-  updateDoc, deleteDoc, doc
-} from "https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore.js";
+import { getFirestore, collection, onSnapshot, updateDoc, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyDL2OFxYzmxKUp5edh6QtD2f5gkb6oZAv4",
@@ -147,66 +149,72 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-/* ADMIN GUARD */
-const ADMINS = ["student.student.on@gmail.com"];
-onAuthStateChanged(auth,user=>{
-  if(!user || !ADMINS.includes(user.email)){
-    location.href="admin-login.html";
-  }
+const ADMINS=["student.student.on@gmail.com"];
+onAuthStateChanged(auth,u=>{
+  if(!u || !ADMINS.includes(u.email)) location.href="admin-login.html";
 });
 
-/* LOGOUT */
-window.logout = ()=>{
-  signOut(auth).then(()=>location.href="admin-login.html");
-};
+window.logout=()=>signOut(auth).then(()=>location.href="admin-login.html");
 
-/* REALTIME BOOKINGS */
-const tbody = document.getElementById("tbody");
-const totalEl = document.getElementById("total");
-const pendingEl = document.getElementById("pending");
-const completedEl = document.getElementById("completed");
+const tbody=document.getElementById("tbody");
+const totalEl=document.getElementById("total");
+const pendingEl=document.getElementById("pending");
+const completedEl=document.getElementById("completed");
 
-onSnapshot(collection(db,"bookings"), snap=>{
+/* LOAD BOOKINGS */
+window.loadBookings=()=>{
+onSnapshot(collection(db,"bookings"),snap=>{
   tbody.innerHTML="";
-  let i=1, pending=0, completed=0;
+  let i=1,p=0,c=0;
 
   snap.forEach(d=>{
     const b=d.data();
-    if(b.status==="Completed") completed++;
-    else pending++;
+    b.status==="Completed"?c++:p++;
 
     tbody.innerHTML+=`
-      <tr>
-        <td>${i++}</td>
-        <td>${b.name}</td>
-        <td>${b.phone}</td>
-        <td>${b.service}</td>
-        <td>${b.date}</td>
-        <td>${b.time}</td>
-        <td>${b.status}</td>
-        <td>
-          <button class="done" onclick="markDone('${d.id}')">✔</button>
-          <button class="delete" onclick="removeBooking('${d.id}')">🗑️</button>
-        </td>
-      </tr>
-    `;
+    <tr>
+      <td>${i++}</td>
+      <td>${b.name}</td>
+      <td>${b.phone}</td>
+      <td>${b.service}</td>
+      <td>${b.date}</td>
+      <td>${b.time}</td>
+      <td>${b.status}</td>
+      <td>
+        <button class="view" onclick='view(${JSON.stringify(b)})'>👁</button>
+        <button class="done" onclick="done('${d.id}')">✔</button>
+        <button class="delete" onclick="del('${d.id}')">🗑</button>
+      </td>
+    </tr>`;
   });
 
-  totalEl.textContent = snap.size;
-  pendingEl.textContent = pending;
-  completedEl.textContent = completed;
+  totalEl.textContent=snap.size;
+  pendingEl.textContent=p;
+  completedEl.textContent=c;
 });
+};
 
 /* ACTIONS */
-window.markDone = async(id)=>{
-  await updateDoc(doc(db,"bookings",id),{status:"Completed"});
+window.done=id=>updateDoc(doc(db,"bookings",id),{status:"Completed"});
+window.del=id=>confirm("Delete?")&&deleteDoc(doc(db,"bookings",id));
+
+/* VIEW DETAILS */
+window.view=b=>{
+  modal.style.display="flex";
+  modalContent.innerHTML=`
+    <h3>📄 Booking Details</h3>
+    <p><b>Name:</b> ${b.name}</p>
+    <p><b>Phone:</b> ${b.phone}</p>
+    <p><b>Address:</b> ${b.address}</p>
+    <p><b>Service:</b> ${b.service}</p>
+    <p><b>Problem:</b> ${b.problem}</p>
+    <p><b>Date:</b> ${b.date}</p>
+    <p><b>Time:</b> ${b.time}</p>
+    <p><b>Status:</b> ${b.status}</p>
+    <button class="close" onclick="modal.style.display='none'">Close</button>`;
 };
 
-window.removeBooking = async(id)=>{
-  if(confirm("Delete this booking?")){
-    await deleteDoc(doc(db,"bookings",id));
-  }
-};
+loadBookings();
 </script>
 
 </body>
