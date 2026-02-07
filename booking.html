@@ -61,42 +61,17 @@ select option{color:#000;}
 textarea{resize:none}
 
 /* BUTTONS */
-.submit{
-  background:#0d6efd;
-  color:#fff;
-  font-weight:bold;
-  cursor:pointer;
-}
-
-.refresh{
-  background:#0d6efd;
-  color:#fff;
-  font-weight:bold;
-  cursor:pointer;
-}
-
-.back{
-  background:#198754;
-  color:#fff;
-  font-weight:bold;
-  cursor:pointer;
-}
-
-button:hover{
-  transform:scale(1.03);
-}
+.submit{background:#0d6efd;color:#fff;font-weight:bold;}
+.refresh{background:#0d6efd;color:#fff;font-weight:bold;}
+.back{background:#198754;color:#fff;font-weight:bold;}
+button:hover{transform:scale(1.03);}
 
 /* STATUS */
-.status-box{
-  margin-top:15px;
-}
-
 .status-summary{
   display:flex;
   gap:8px;
   margin-bottom:8px;
 }
-
 .badge{
   flex:1;
   padding:8px;
@@ -104,7 +79,6 @@ button:hover{
   border-radius:8px;
   background:rgba(255,255,255,.2);
 }
-
 .status-card{
   background:rgba(255,255,255,.15);
   padding:10px;
@@ -152,7 +126,6 @@ button:hover{
   <div class="badge">Completed: <span id="completed">0</span></div>
 </div>
 
-<!-- ✅ Instruction text (YOU ASKED THIS) -->
 <p style="text-align:center;font-size:13px;opacity:.85;margin:10px 0;">
   Enter phone number to see status
 </p>
@@ -160,7 +133,7 @@ button:hover{
 <button class="refresh" onclick="refreshStatus()">🔄 Refresh Status Check</button>
 <button class="back" onclick="backToBooking()">⬅ Back to Booking</button>
 
-<div id="statusBox" class="status-box"></div>
+<div id="statusBox"></div>
 
 </div>
 
@@ -172,7 +145,7 @@ import {
   query, where, getDocs
 } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore.js";
 
-/* FIREBASE */
+/* FIREBASE CONFIG */
 const firebaseConfig = {
   apiKey: "AIzaSyDL2OFxYzmxKUp5edh6QtD2f5gkb6oZAv4",
   authDomain: "smartfix-computer-service.firebaseapp.com",
@@ -183,35 +156,31 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-const form = document.getElementById("bookingForm");
-const msg = document.getElementById("msg");
-const statusBox = document.getElementById("statusBox");
-
 /* LOGOUT */
 window.logout = ()=>{
   signOut(auth).then(()=>location.href="index.html");
 };
 
 /* SUBMIT BOOKING */
-form.addEventListener("submit", async e=>{
+document.getElementById("bookingForm").addEventListener("submit", async e=>{
   e.preventDefault();
 
   try{
     await addDoc(collection(db,"bookings"),{
-      name:name.value,
-      phone:phone.value,
-      address:address.value,
-      service:service.value,
-      problem:problem.value,
-      date:date.value,
-      time:time.value,
-      status:"Pending",
-      createdAt:serverTimestamp()
+      name: name.value || "",
+      phone: phone.value || "",
+      address: address.value || "",
+      service: service.value || "",
+      problem: problem.value || "",
+      date: date.value || "",
+      time: time.value || "",
+      status: "Pending",
+      createdAt: serverTimestamp()
     });
 
     msg.textContent="✅ Booking successful!";
-    form.reset();
     refreshStatus();
+    e.target.reset();
   }catch(err){
     msg.textContent="❌ "+err.message;
   }
@@ -240,15 +209,21 @@ window.refreshStatus = async ()=>{
     `;
   });
 
-  document.getElementById("total").innerText=total;
-  document.getElementById("pending").innerText=pending;
-  document.getElementById("completed").innerText=completed;
+  totalSpan.textContent=total;
+  pendingSpan.textContent=pending;
+  completedSpan.textContent=completed;
 };
 
-/* BACK TO BOOKING */
+/* BACK */
 window.backToBooking = ()=>{
   window.scrollTo({top:0,behavior:"smooth"});
 };
+
+const msg = document.getElementById("msg");
+const statusBox = document.getElementById("statusBox");
+const totalSpan = document.getElementById("total");
+const pendingSpan = document.getElementById("pending");
+const completedSpan = document.getElementById("completed");
 </script>
 
 </body>
